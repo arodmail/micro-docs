@@ -27,7 +27,7 @@ BUILD SUCCESSFUL in 9s
 16 actionable tasks: 16 executed
 </pre>
 
-This step reads the <code>build.gradle</code> file and executes the build configuration. The build script defines the project and tasks to run. For example, JUnit tests that are located under <code>/src/test/java</code> are executed as part of the <code>test</code> task. The example above indicates that 3 tests, UnitTest, ContractTest, and IntegrationTest, run and pass. For more details about microservice tests see <a href="" uri="Write Run Tests">Write & Run Tests</a>.
+This step reads the <code>build.gradle</code> file and executes the build configuration. The build script defines the project and tasks to run. For example, JUnit tests that are located under <code>/src/test/java</code> are executed as part of the <code>test</code> task. The example above indicates that 3 tests, UnitTest, ContractTest, and IntegrationTest, run and pass. For more details about microservice tests see <a href="" uri="write-run-tests">Write & Run Tests</a>.
 
 </p></p>
 
@@ -37,11 +37,11 @@ This step reads the <code>build.gradle</code> file and executes the build config
 
 The CI/CD build process executes the build configuration on a build server when files are successfully pushed into the microservice repository. To trigger the CI/CD build process on the build server, commit and push all changes to the <b>integration</b> branch of the repository or to a features branch.
 
-<img src="../images/jenkins-pipeline-branch.png" />
+<img src="images/jenkins-pipeline-branch.png" />
 
 </p></p>
 
-You can create a features branch locally as long as you have initialized the repo as recommended in the <a href="" uri="Create a Repo">Create a Repo</a> step in the developer's workflow. From your terminal window, list the branches on your repository.
+You can create a features branch locally as long as you have initialized the repo as recommended in the <a href="" uri="create-a-repo">Create a Repo</a> step in the developer's workflow. From your terminal window, list the branches on your repository.
 
 <pre>
 $ git branch
@@ -124,7 +124,7 @@ https://sample-integration.dal09-dev.k8s-lab.sec.ibm.com
 
 When a features branch is merged into master or a microservice developer sends a git push command into the master branch for the repository, then the CI/CD pipeline builds, scans and deploys a new container image to the master namespace in the container orchestrator.
 
-<img src="../images/jenkins-pipeline-master.png" />
+<img src="images/jenkins-pipeline-master.png" />
 
 <h3>End-To-End</h3>
 

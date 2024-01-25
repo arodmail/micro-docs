@@ -177,7 +177,7 @@ x-mss-permissions:
   - ticketIssueTypes: issueTypes
 </pre>
 
-The <code>x-mss-permissions</code> section is read by the <a href="" uri="Secure Proxy">Secure Proxy</a> deployed as a sidecar to scan and filter the payload for an inbound API request (HTTP POST, PUT, and PATCH) to verify that the values in the payload match a Customer ID, Device ID, and Ticket Issue Type that the user has permission to update. These values are also used to scan outbound response payloads for Customer ID, Device ID, and Ticket Issue Type to verify that the user has permission to access (read) all values included in the response payload (HTTP GET).
+The <code>x-mss-permissions</code> section is read by the <a href="" uri="secure-proxy">Secure Proxy</a> deployed as a sidecar to scan and filter the payload for an inbound API request (HTTP POST, PUT, and PATCH) to verify that the values in the payload match a Customer ID, Device ID, and Ticket Issue Type that the user has permission to update. These values are also used to scan outbound response payloads for Customer ID, Device ID, and Ticket Issue Type to verify that the user has permission to access (read) all values included in the response payload (HTTP GET).
 
 </p></p>
 

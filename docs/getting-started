@@ -32,11 +32,11 @@ Because design and documentation are interrelated, the <a uri="documentation">Do
 
 <h4>Setup</h4>
 
-The Setup stage of the workflow is all about preparing a GitHub repository for the CI/CD process. The <a uri="Create a Repo">Create a Repo</a> step goes over a template repository that contains pre-defined sources for the configuration files that drive the CI/CD build and deployment process.
+The Setup stage of the workflow is all about preparing a GitHub repository for the CI/CD process. The <a uri="create-a-repo">Create a Repo</a> step goes over a template repository that contains pre-defined sources for the configuration files that drive the CI/CD build and deployment process.
 
 <h4>Develop</h4>
 
-The Develop stage gets into the <a uri="implement">Microservice Implementation</a> step of the workflow. The microservices environment is designed to support multiple development frameworks and programming languages. When a team works independently on a microservice, the team is enabled to make their own implementation decisions without any major coordination and consensus across the entire organization. The microservices environment is designed with this implementation goal in mind. During the Develop stage, teams may also give consideration to the <a uri="Secure">API Security</a> step.
+The Develop stage gets into the <a uri="implement">Microservice Implementation</a> step of the workflow. The microservices environment is designed to support multiple development frameworks and programming languages. When a team works independently on a microservice, the team is enabled to make their own implementation decisions without any major coordination and consensus across the entire organization. The microservices environment is designed with this implementation goal in mind. During the Develop stage, teams may also give consideration to the <a uri="security">API Security</a> step.
 
 <h4>Test</h4>
 

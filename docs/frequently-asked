@@ -74,7 +74,7 @@ For Microservices that use the Log4j2 Console Appender, all output written the L
 
 </p></p>
 
-APIs that are registered in the API Registry do not automatically appear on API Explorer's Main Page. The API Registry is an Elastic Search index that stores information about and categorizes APIs based on their intended use. The API Gateway automatically registers APIs into the API Registry but does not auto-Publish an API. To manually Publish an API see <a href="" uri="API Explorer">API Explorer</a> >  API Registry.
+APIs that are registered in the API Registry do not automatically appear on API Explorer's Main Page. The API Registry is an Elastic Search index that stores information about and categorizes APIs based on their intended use. The API Gateway automatically registers APIs into the API Registry but does not auto-Publish an API. To manually Publish an API see <a href="" uri="api-explorer">API Explorer</a> >  API Registry.
 
 </p></p>
 
