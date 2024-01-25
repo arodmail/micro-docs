@@ -40,7 +40,7 @@ rm -rf .git
 git init
 </pre>
 
-<b>Important Note:</b> The <code>{repo_name}</code> for a Microservice is very important to establish up front. While not impossible to rename a project, it becomes more difficult over time because it is referenced throughout the CI/CD configuration files in the repository and becomes part of the URL that applications address to send requests to the API. For more information about the relationship between <code>{repo_name}</code> and API URLs, see <a href="" uri="Build Deploy">Build & Deploy</a>.
+<b>Important Note:</b> The <code>{repo_name}</code> for a Microservice is very important to establish up front. While not impossible to rename a project, it becomes more difficult over time because it is referenced throughout the CI/CD configuration files in the repository and becomes part of the URL that applications address to send requests to the API. For more information about the relationship between <code>{repo_name}</code> and API URLs, see <a href="" uri="build-deploy">Build & Deploy</a>.
 
 <h2 class="uk-h3 tm-heading-fragment">Project Template Files</h2>
 
@@ -161,7 +161,7 @@ Note: For a Java implementation of a microservice, this directory structure may 
 
 <h4>Source Test</h4>
 
-The Java package structure under <code>src/main/java</code> is typically mirrored under <code>/src/test/java</code> such that at test time, test classes compile to the same packages as the classes they test. This gives the test classes package-level access or access to protected methods and fields. For more details about Microservice tests see <a href="" uri="Write Run Tests">Write & Run Tests</a>.
+The Java package structure under <code>src/main/java</code> is typically mirrored under <code>/src/test/java</code> such that at test time, test classes compile to the same packages as the classes they test. This gives the test classes package-level access or access to protected methods and fields. For more details about Microservice tests see <a href="" uri="write-run-tests">Write & Run Tests</a>.
 
 <h2 class="uk-h3 tm-heading-fragment">Next Steps</h2>
 
