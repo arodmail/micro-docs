@@ -107,7 +107,7 @@ Here tests are dependent on the state of other microservices, and on the state o
 
 </p></p>
 
-Microservice developers should be aware of end-to-end testing. Use of <a href="" uri="API Explorer">API Explorer</a> as the basis for End-to-End testing of microservices is a highly recommended approach.
+Microservice developers should be aware of end-to-end testing. Use of <a href="" uri="api-explorer">API Explorer</a> as the basis for End-to-End testing of microservices is a highly recommended approach.
 
 </p></p>
 
