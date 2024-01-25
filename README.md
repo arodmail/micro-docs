@@ -1,5 +1,5 @@
-# API Docs 
+# Micro Docs 
 
-The `api_docs` repository provides documentation and a workflow for microservices development. 
+The `micro-docs` repository provides documentation and a workflow for microservices development. 
 
-GitHub Pages: [https://arodmail.github.io/api_docs/](https://arodmail.github.io/api_docs/)
+GitHub Pages: [https://arodmail.github.io/micro-docs/](https://arodmail.github.io/micro-docs/)
