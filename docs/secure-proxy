@@ -34,4 +34,4 @@ For a working example of the Secure Proxy Sidecar, see the "customer-ms" Pod in 
 
 <h4 class="uk-h4 tm-heading-fragment">Secure Proxy Sidecar Configuration</h4>
 
-For details about settings in API Swagger definitions that drive the sidecar's inbound request and outbound response security scans, see <a href="" uri="Secure">Secure API</a> > Authorization.
+For details about settings in API Swagger definitions that drive the sidecar's inbound request and outbound response security scans, see <a href="" uri="security">Secure API</a> > Authorization.

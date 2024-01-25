@@ -113,4 +113,4 @@ Microservice developers should be aware of end-to-end testing. Use of <a href=""
 
 <h2 class="uk-h3 tm-heading-fragment">Next Steps</h2>
 
-After deciding how many and what kinds of tests to write and run, developers may take the next step in the developer's workflow: <a href="" uri="Build Deploy">Build & Deploy</a>.
+After deciding how many and what kinds of tests to write and run, developers may take the next step in the developer's workflow: <a href="" uri="build-deploy">Build & Deploy</a>.

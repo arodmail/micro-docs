@@ -165,4 +165,4 @@ The Java package structure under <code>src/main/java</code> is typically mirrore
 
 <h2 class="uk-h3 tm-heading-fragment">Next Steps</h2>
 
-Once a repository for a microservice project is created and initialized, developers may take the next step in the developer's workflow: <a href="" uri="Implementation">Microservice Implementation</a>.
+Once a repository for a microservice project is created and initialized, developers may take the next step in the developer's workflow: <a href="" uri="implement">Microservice Implementation</a>.

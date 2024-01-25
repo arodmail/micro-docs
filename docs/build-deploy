@@ -199,5 +199,5 @@ Deployment to the Kubernetes cluster in production is a scheduled release task t
 
 <h2 class="uk-h3 tm-heading-fragment">Next Steps</h2>
 
-This section covers the Build & Deploy step in the Microservice Developer's workflow, including the CI/CD build process, the use of feature branches, and the relationship between a repository name, F5 URLs, and the internal request forwarding that takes place when the API Gateway receives microservice API calls. The next step is to verify that all HTTP methods, paths, parameters into and out of the microservice API work as expected, end-to-end, using <a href="" uri="API Explorer">API Explorer</a>.
+This section covers the Build & Deploy step in the Microservice Developer's workflow, including the CI/CD build process, the use of feature branches, and the relationship between a repository name, F5 URLs, and the internal request forwarding that takes place when the API Gateway receives microservice API calls. The next step is to verify that all HTTP methods, paths, parameters into and out of the microservice API work as expected, end-to-end, using <a href="" uri="api-explorer">API Explorer</a>.
 

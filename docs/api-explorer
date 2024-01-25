@@ -116,4 +116,4 @@ For an API to appear on the API Explorer main page, the API <b>must</b> be consi
 
 <h2 class="uk-h3 tm-heading-fragment">Next Steps</h2>
 
-The next step in the Microservice Developer's workflow is to ensure the documentation for your API meets certain minimum standards for production readiness. For recommendations, see <a href="" uri="Document">Document APIs</a>.
+The next step in the Microservice Developer's workflow is to ensure the documentation for your API meets certain minimum standards for production readiness. For recommendations, see <a href="" uri="documentation">Document APIs</a>.

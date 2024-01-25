@@ -339,7 +339,7 @@ To authenticate through the API Explorer links above, see <a href="" uri="Secure
 
 <h2 class="uk-h3 tm-heading-fragment">Next Steps</h2>
 
-This section covered the basics of an OpenAPI specification, using Swagger Editor to define a RESTful Sample API. Microservice developers are highly encouraged to start with their API definition and to design APIs "up front" before getting into an implementation that supports it. This approach makes a pass at an API that is clear, intuitive, and follows basic RESTful API design principles. With this step completed, microservice developers may take the next step in the developer's workflow: <a href="" uri="Create a Repo"> Create a Repo</a>.
+This section covered the basics of an OpenAPI specification, using Swagger Editor to define a RESTful Sample API. Microservice developers are highly encouraged to start with their API definition and to design APIs "up front" before getting into an implementation that supports it. This approach makes a pass at an API that is clear, intuitive, and follows basic RESTful API design principles. With this step completed, microservice developers may take the next step in the developer's workflow: <a href="" uri="create-a-repo"> Create a Repo</a>.
 
 </p></p>
 
