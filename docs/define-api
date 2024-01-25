@@ -83,7 +83,7 @@ info:
 
 The top "info" object contains a
 <code>description</code> field used for a top-level API description. A fully documented API definition includes a top-level description that explains to an API Consumer what the API exposes and how the API is designed to be used. The API description also defines terms that users of the API may not know. If an API request requires a backend to connect to a datasource to fetch data, then the datasource is mentioned in the API description. The purpose of the description field is to briefly but fully describe the API for an API Consumer in paragraph form. For more details about API documentation, see
-<a href="" uri="Document"> Document APIs</a>.
+<a href="" uri="documentation"> Document APIs</a>.
 
 </p></p>
 
