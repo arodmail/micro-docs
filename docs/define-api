@@ -1,0 +1,345 @@
+<h2>Define API</h2><script>if (document = top) window.location.href = "../index.html";</script>
+
+<div>By Alex Rodriguez | Updated June 01, 2020</div>
+
+</p></p>
+
+This section requires a basic understanding of RESTful APIs, the OpenAPI Specification, and the Swagger UI Tool. For more information see:
+
+<ul>
+    <li><a href="https://www.ibm.com/developerworks/library/ws-restful/index.html" target="_blank">REST Web Services:
+        The Basics</a></li>
+    <li><a href="https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md" target="_blank">Open API
+        Specification</a></li>
+    <li><a href="https://swagger.io/tools/swagger-ui/" target="_blank">Swagger UI</a></li>
+</ul>
+
+</p></p>
+
+<h2 class="uk-h3 tm-heading-fragment">Resource</h2>
+
+Before anything else, API developers are encouraged to give careful consideration to the interface required for a business critical application. A well defined API that follows the basic principles of RESTful API design, provides a highly compatible interface for a  wide-range of business applications written in different languages and running on different platforms. This basic API design approach focuses on a single "resource" and on the definition of GET, POST, PUT, DELETE, and PATCH methods that are exposed by the API to manage the resource.
+
+</p></p>
+
+Before moving into the next steps, decide what resource your API creates, reads, updates, and deletes. What resource does the API expose and manage? A resource is sometimes the same concept as an "entity" in a data model.
+
+</p></p>
+
+The next sections are a step by step approach to define a Sample  API that manages a resource called "resource".
+
+</p></p>
+
+<h2 class="uk-h3 tm-heading-fragment">Swagger Editor</h2>
+
+A simple way to start to define an API is to visualize it in <a href="https://editor.swagger.io/" target="_blank">Swagger
+    Editor</a>. It is an editor with two sides: the left side validates JSON or YAML as you type, and the right side visualizes an API definition in Swagger UI. To get started, copy/paste the following segment into Swagger Editor:
+
+</p></p>
+
+<pre>
+---
+swagger: "2.0"
+info:
+  description: Sample Swagger documentation for a Microservice API.
+  version: "1.0.0"
+  title: "Sample API"
+host: "localhost"
+basePath: "/micro/sample"
+schemes:
+- "https"
+- "http"
+paths:
+  /resource/{resourceId}:
+    get:
+      tags:
+      - "resource"
+      summary: "Find a resource"
+      description: "Returns a single resource"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "resourceId"
+        in: "path"
+        description: "ID of resource to return (e.g., \"123\")"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Successful operation"
+</pre>
+
+<h2 class="uk-h3 tm-heading-fragment">Info</h2>
+
+<pre>
+info:
+  description: Sample Swagger documentation for a Microservice API.
+  version: "1.0.0"
+  title: "Sample API"
+</pre>
+
+</p></p>
+
+The top "info" object contains a
+<code>description</code> field used for a top-level API description. A fully documented API definition includes a top-level description that explains to an API Consumer what the API exposes and how the API is designed to be used. The API description also defines terms that users of the API may not know. If an API request requires a backend to connect to a datasource to fetch data, then the datasource is mentioned in the API description. The purpose of the description field is to briefly but fully describe the API for an API Consumer in paragraph form. For more details about API documentation, see
+<a href="" uri="Document"> Document APIs</a>.
+
+</p></p>
+
+The
+<code>version</code> field tells API Consumers about major or minor updates in the API depending on which part of the version number is incremented.
+
+</p></p>
+
+The
+<code>title</code> field value is displayed at the top of Swagger UI in a big bold font and is likely to be how the API is referred to in team meetings.
+
+</p></p>
+
+<h2 class="uk-h3 tm-heading-fragment">Host, BasePath, & Schemes</h2>
+
+<pre>
+host: "localhost"
+basePath: "/micro/sample"
+schemes:
+- "https"
+- "http"
+</pre>
+
+</p></p>
+
+The <code>host</code> field may be an IP address, a hostname including the domain and optionally a port number. Some examples of valid host values are:
+
+<pre>
+host: "localhost"
+host: "127.0.0.1"
+host: "services.sec.ibm.com:443"
+</pre>
+
+</p></p>
+
+The <code>basePath</code> field value is always appended to the <code>scheme</code> and <code>host</code> values in Swagger UI to assemble a fully qualified URL for the methods the API exposes.
+
+<pre>
+{scheme}://{host}/{basePath}
+</pre>
+
+For example:
+
+<pre>
+https://services.sec.ibm.com:443/micro/sample
+</pre>
+
+Where the <code>basePath: "/micro/sample"</code> is expected to be the root of all the paths defined by the "Sample API".
+
+</p></p>
+
+<b>Note:</b> In Microservices all HTTP traffic is proxied by an API Gateway. The basePath field value should always start with a "/micro" prefix to ensure HTTP requests are recognized and processed by the API Gateway. The "/sample" part of the basePath in the example above typically matches up with the name given to a Microservice repository. For more details about Microservice GitHub  repository names and the relationship to an API's basePath, see <a href="" uri="Create a Repo"> Create a Repo</a> and <a href="" uri="Build Deploy">Build & Deploy</a>
+
+</p></p>
+
+<h2 class="uk-h3 tm-heading-fragment">Paths</h2>
+
+The <code>paths</code> object defines relative paths and the HTTP methods that are supported within them. A path is <b>appended to</b> (relative to) the scheme, host, and basePath to assemble a fully qualified URL for the HTTP method defined within the path.
+
+</p></p>
+
+For example:
+
+<pre>
+paths:
+  /resource/{resourceId}:
+    get:
+      tags:
+      - "resource"
+      summary: "Find a resource"
+      description: "Returns a single resource"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "resourceId"
+        in: "path"
+        description: "ID of resource to return (e.g., \"123\")"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Successful operation"
+</pre>
+</p></p>
+
+Defines a <code>/resource/{resourceId}:</code> path that supports HTTP GET requests. The <code>get:</code> request HTTP method within this path returns a JSON payload:
+
+<pre>
+    produces:
+      - "application/json"
+</pre>
+
+And requires a <code>{resourceId}</code> to be included as a parameter that is the last part of the path. This <code>- name: "resourceId"</code> parameter must be included, and may only be an integer:
+
+<pre>
+        required: true
+        type: "integer"
+        format: "int64"
+</pre>
+
+When an HTTP GET request is sent to:
+
+<pre>
+GET {scheme}://{host}/{basePath}/resource/{resourceId}
+</pre>
+
+That is successful, then an HTTP response code 200 is expected to be included in the response.
+
+<pre>
+      responses:
+        200:
+          description: "Successful operation"
+</pre>
+
+</p></p>
+
+This is really the basic thing to understand about <code>paths:</code>. Any other HTTP methods that are supported by this path may be included under <code>/resource/{resourceId}:</code>.
+
+</p></p>
+
+For example, to define support for HTTP DELETE:
+
+<pre>
+paths:
+  /resource/{resourceId}:
+    get:
+     # ...
+    delete:
+      tags:
+      - "resource"
+      summary: "Delete a resource"
+      description: "Delete an existing resource"
+      parameters:
+      - name: "resourceId"
+        in: "path"
+        description: "ID of resource to delete (e.g., \"123\")"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Successful operation"
+</pre>
+
+Defines within the <code>/resource/{resourceId}:</code> path, an HTTP DELETE request that requires a <code>{resourceId}</code> parameter to be included on the path that may only be of <code>type: "integer"</code>, and when the DELETE request is successful, then a <code>200</code> response code is expected to be in the response from the API.
+
+</p></p>
+
+By extending the <code>paths</code> section to include support for additional relative paths and the HTTP method definitions that can be sent to them, we end up defining a full RESTful API that supports GET, POST, PUT, DELETE, and PATCH.
+
+</p></p>
+
+In Swagger Editor, try to copy/paste the <code>delete:</code> segment above after the indented segment within <code>get:</code>. Provided the YAML indentation is correct, then both GET and DELETE methods should be displayed in Swagger UI.
+
+</p></p>
+
+</p></p>
+
+<b>Note:</b> In the examples above, the <code>/resource/{resourceId}</code> path points to the resource that the Sample API manages: "resource". This convention is highly encouraged for API developers to follow in order to provide API Consumers and business critical applications intuitive URLs that are simple to understand and make sense in the context of create, read, update, and delete operations that are focused on a single resource managed by the API.
+
+</p></p>
+
+<h2 class="uk-h3 tm-heading-fragment">Responses</h2>
+
+In the examples above, the GET and DELETE methods supported within the <code>/resources/{resourceId}</code> path have only defined a response code for success within <code>responses:</code>. But as we know all too well, errors are part of life and must be handled gracefully when (not if) they happen.
+
+The <code>responses</code> section is intended to include a full definition of all HTTP response codes, including errors, for each HTTP method supported within a path.
+
+<pre>
+responses:
+        200:
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/resource"
+        400:
+          description: "Credentials required"
+          schema:
+            $ref: "#/definitions/Error"
+        401:
+          description: "Authorization information is missing or invalid."
+          schema:
+            $ref: "#/definitions/Error"
+        404:
+          description: "The data requested was not found."
+          schema:
+            $ref: "#/definitions/Error"
+        5XX:
+          description: "Unexpected error."
+          schema:
+            $ref: "#/definitions/Error"
+</pre>
+
+In the section above, HTTP codes 200, 400, 401, 404 and 500 are described and refer to something else in the OpenAPI specification, the corresponding <i>schema</i> for an object that is the return type or payload when the API generates each response code. Within each error response:
+
+<pre>
+      schema:
+        $ref: "#/definitions/Error"
+</pre>
+
+The <code>$ref</code> field points to a separate section of the specification where something called <code>/definitions/Error</code> is defined.
+
+</p></p>
+
+<h2 class="uk-h3 tm-heading-fragment">Definitions</h2>
+
+The last section to understand from a very basic standpoint is <code>definitions:</code> where the Objects and their properties are defined like a schema:
+
+<pre>
+definitions:
+  ok:
+    type: "object"
+    properties:
+      rsp:
+        type: "string"
+  resource:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+  Error:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      message:
+        type: "string"
+</pre>
+
+In the example above, the <code>Error</code> object referenced as a <code>schema:</code> is where the <code>responses:</code> section points to for the full schema of an Object. This convention, referring to an Object schema, is widely used in OpenAPI specifications to encourage reuse and to avoid duplication throughout the spec.
+
+</p></p>
+
+The full "Sample API" Swagger definition can be viewed in API Explorer under "Sample APIs" (requires authentication):
+
+<ul>
+  <li><a href="https://api-explorer-integration.dal09-dev.k8s-lab.sec.ibm.com/api_explorer/" target="_blank">Dev</a>
+  </li>
+  <li>
+    <a href="https://stg-services.sec.ibm.com/api_explorer/" target="_blank">Stg</a>
+  </li>
+  <li>
+    <a href="https://services.sec.ibm.com/api_explorer/" target="_blank">Prd</a>
+  </li>
+</ul>
+
+To authenticate through the API Explorer links above, see <a href="" uri="Secure">API Security</a> > Authentication
+
+<h2 class="uk-h3 tm-heading-fragment">Next Steps</h2>
+
+This section covered the basics of an OpenAPI specification, using Swagger Editor to define a RESTful Sample API. Microservice developers are highly encouraged to start with their API definition and to design APIs "up front" before getting into an implementation that supports it. This approach makes a pass at an API that is clear, intuitive, and follows basic RESTful API design principles. With this step completed, microservice developers may take the next step in the developer's workflow: <a href="" uri="Create a Repo"> Create a Repo</a>.
+
+</p></p>
+

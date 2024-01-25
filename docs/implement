@@ -1,0 +1,383 @@
+<h2>Microservice Implementation</h2><script>if (document = top) window.location.href = "../index.html";</script>
+
+<div>By Alex Rodriguez | Updated June 01, 2020</div>
+
+</p></p>
+
+At a basic level, a microservice implementation of an API simply opens a port, listens for HTTP requests, and produces a response. In Microservices, an implementation is also source code in a repository that a CI/CD build process compiles, tests, scans, analyzes, and then converts to a container image that is deployed to a container platform.
+</p></p>
+
+Microservices is not a one size fits all environment. Development teams have options in choosing a framework and in selecting a programming language to use in their microservice implementation. In some cases Java may be the right choice, in others Python. Some teams may leverage Vert.x while others may take advantage of embedded Tomcat. In some cases purists may just go with the JDK only to avoid the headaches of third-party dependencies. These are technical decisions that development teams can make.
+
+</p></p>
+
+Given a range of options, this section is intended to provide some guidance to development teams in the choice of a development framework and the selection of a programming language in which to implement a microservice. Some options are listed here (that are available at this time) and this section tries to provide a balanced evaluation of the advantages and disadvantages of each.
+
+</p></p>
+
+
+<h2 class="uk-h3 tm-heading-fragment">Frameworks & Toolkits</h2>
+
+
+<h4>Pure JDK</h4>
+
+Microservice development teams have the option to avoid frameworks altogether and to minimize third-party dependencies. A "Pure JDK" approach uses only the packages and classes in the JDK to keep things simple and free from dependencies. For example, <a href="https://docs.oracle.com/javase/8/docs/jre/api/net/httpserver/spec/com/sun/net/httpserver/HttpServer.html" target="_blank">HttpServer</a> is a small Java web server that ships with the JDK since Java 6. HttpServer is suitable for Java developers comfortable with basic Java programming and for microservices that need to remain small and efficient.
+
+</p></p>
+
+<pre>
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+
+public class Main {
+
+    public static void main(String[] args) throws IOException {
+        HttpServer server = HttpServer.create(new InetSocketAddress(1080), 0);
+        server.createContext("/hello", new HttpHandler() {
+            @Override
+            public void handle(HttpExchange he) throws IOException {
+                String responseStr = "{ \"rsp\" : \"Hello world\" }";
+                he.getResponseHeaders().add("encoding", "UTF-8");
+                he.sendResponseHeaders(200, responseStr.length());
+                he.getResponseBody().write(responseStr.getBytes(StandardCharsets.UTF_8));
+                he.close();
+            }
+        });
+        server.start();
+    }
+
+}
+</pre>
+
+</p></p>
+
+Basic usage is to create an instance of <code>HttpServer</code>, bind the instance to a port number, and associate the server with one or more <code>HttpHandler</code>, each of which is mapped to a URI path. The URIs that HttpHandler are mapped to define endpoints for the microservice. When a request that matches a URI path is received, then HttpServer invokes the Handler.handle() callback method. Running the example above opens port 1080, listens for HTTP requests, and produces a "Hello world" JSON response:
+
+</p></p>
+
+<pre>
+$ curl http://localhost:1080/hello
+{ "rsp" : "Hello world" }
+</pre>
+
+</p></p>
+
+The Main class above is a stripped down example, but shows very simply that a microservice can be fully implemented using the <code>com.sun.net.httpserver</code> package (no dependencies) with the following practical advantages over the use of a heavy framework:
+
+<ul>
+    <li>Keeps the service small and resource efficient, ideal for running multiple instances that scale horizontally</li>
+    <li>Gives developers control over what is built into the container image before deploying to production (no bloated jar files)</li>
+    <li>Secures the code base because it minimizes the service's attack surface</li>
+    <li>Speeds up the CI/CD build process, as there are fewer jar files to scan and analyze for vulnerabilities and licenses.</li>
+</ul>
+
+</p></p>
+
+For these reasons, before making a commitment to a heavy framework, microservice developers are encouraged to give consideration to a much simpler Pure JDK approach for their implementations.
+
+<h4>Tomcat</h4>
+
+Embedded <a href="https://tomcat.apache.org/" target="_blank">Tomcat</a> continues to be a highly reliable choice for teams with experience developing web-applications in a Servlet Engine using Java Servlets and JSP. A start-up class for a microservice with an embedded Tomcat server looks like a regular Java program.
+
+</p></p>
+
+To use Tomcat in your microservice add the following dependencies to your <code>build.gradle</code> file, using the correct version:
+
+<pre>
+dependencies {
+    def tomcatVersion = '9.0.10'
+    compile "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}"
+    compile "org.apache.tomcat.embed:tomcat-embed-jasper:${tomcatVersion}"
+}
+</pre>
+
+</p></p>
+
+Add a start-up class, a Java program with a main method that creates an instance of the Tomcat server, binds it to a port number, and deploys a web application, not from a .war file, but from an exploded directory that has a standard web-application directory structure:
+
+<pre>
+import java.io.File;
+import org.apache.catalina.startup.Tomcat;
+
+public class TomcatRun {
+
+    public static void main(String[] args) throws Exception {
+        Tomcat tomcat = new Tomcat();
+        tomcat.getConnector().setPort(8080);
+        tomcat.addWebapp("", new File("src/main/resources/").getAbsolutePath());
+        tomcat.start();
+        tomcat.getServer().await();
+    }
+}
+</pre>
+
+In the example above, the <code>src/main/resources</code> directory in the microservice repository is expected to have the following structure:
+
+</p></p>
+
+<pre>
+resources/
+├── WEB-INF
+│   └── web.xml
+└── hello.jsp
+</pre>
+
+Where <code>web.xml</code> is a standard web-application deployment descriptor.
+
+</p></p>
+
+<b>Note</b>: The CI/CD build process converts source code in a repository to a container image. At build time, the   <code>scr/main/resources</code> directory contents are copied into a <code>conf</code> directory in the container image. For the start-up class running in a container to find the exploded war directory from which to deploy a web-application, the absolute path to the conf directory should be specified as <code>../conf</code>:
+
+<pre>
+        tomcat.addWebapp("", new File("../conf").getAbsolutePath());
+</pre>
+
+Developers may add support to the start-up class to deploy the exploded web-application from <code>scr/main/resources</code> directory when running locally, and from <code>../conf</code> when running in the Kubernetes cluster.
+
+</p></p>
+
+To declare a <code>HelloServlet</code> that is mapped to the <code>/hello</code> URI in <code>web.xml</code>:
+
+<pre>
+$ cat resources/WEB-INF/web.xml
+&lt;web-app&gt;
+    &lt;servlet&gt;
+        &lt;servlet-name&gt;HelloServlet&lt;/servlet-name&gt;
+        &lt;jsp-file&gt;/hello.jsp&lt;/jsp-file&gt;
+    &lt;/servlet&gt;
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;HelloServlet&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;/hello/*&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+&lt;/web-app&gt;
+</pre>
+
+And for convenience, a simple definition of a <code>hello.jsp</code> page to generate a JSON response:
+
+<pre>
+$ cat resources/hello.jsp
+{ "rsp" : "Hello world" }
+</pre>
+
+Running the start-up class for embedded Tomcat in the example above opens port 8080, listens for HTTP requests, and produces a "Hello world" JSON response:
+
+<pre>
+$ curl http://localhost:8080/hello
+{ "rsp" : "Hello world" }
+</pre>
+
+Apache Tomcat software is the power behind many large-scale, mission-critical web applications across a wide range of industries and organizations, including Services. Microservice development teams may consider embedded Tomcat server as:
+
+<ul>
+    <li>The most widely used and very well known Java Servlet engine</li>
+    <li>A lightweight alternative to a heavy, lesser known framework</li>
+    <li>Approved by IBM legal</li>
+    <li>Experienced teams can transfer skills to fully leverage Tomcat and Java Servlet features in their microservices</li>
+    <li>Existing web-applications can easily be containerized and deployed to a container platform</li>
+</ul>
+
+<h4>Vert.x</h4>
+
+For development teams in favor of a non-blocking, asynchronous programming model, <a href="https://vertx.io/" target="_blank">Vert.x</a> has become a popular choice as a framework (or toolkit) to implement microservices and REST APIs. One of the core concepts in Vert.x is that it uses an event bus to pass events asynchronously to handlers that you write and configure.
+
+</p></p>
+
+To use Vert.x in your microservice implementation, add the following dependency to your <code>build.gradle</code> file using the correct version:
+
+<pre>
+dependencies {
+    compile group: 'io.vertx', name: 'vertx-web', version: '3.5.2'
+}
+</pre>
+
+The Vert.x engine runs a "Verticle" which is a class that implements the <code>io.vertx.core.Verticle</code> interface or that extends <code>io.vertx.core.AbstractVerticle</code>. A Verticle that extends AbstractVerticle may override the start() method to create and configure a <code>io.vertx.ext.web.Router</code> by associating it with a processing handler, an implementation of the <code>io.vertx.core.Handler</code> interface. The handler provides a handle() callback method that accepts a <code>io.vertx.ext.web.RoutingContext</code> and produces a JSON response:
+
+</p></p>
+
+<pre>
+package com.ibm.sec.micro;
+
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.ext.web.Router;
+import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.BodyHandler;
+
+public class HelloVerticle extends AbstractVerticle {
+
+    @Override
+    public void start(Future&lt;Void&gt; future) {
+        Router router = Router.router(vertx);
+        router.route().handler(BodyHandler.create());
+        Handler helloHandler = new Handler&lt;RoutingContext&gt;() {
+            @Override
+            public void handle(RoutingContext ctx) {
+                ctx.response()
+                        .putHeader("content-type", "application/json")
+                        .setStatusCode(200)
+                        .end("{ \"rsp\" : \"Hello world\" }");
+            }
+        };
+
+        router.get("/hello").handler(helloHandler);
+
+        vertx.createHttpServer()
+                .requestHandler(router::accept)
+                .listen(config().getInteger("http.port", 8081),
+                        result -> {
+                            if (result.succeeded()) {
+                                future.complete();
+                            } else {
+                                future.fail(result.cause());
+                            }
+                        });
+    }
+
+    public static void main(String[] args)
+    {
+        io.vertx.core.Launcher.main(new String[]{"run", "com.ibm.sec.micro.HelloVerticle"});
+    }
+
+}
+</pre>
+
+</p></p>
+
+The implementation of the <code>HelloVerticle.start()</code> method in the example above maps a GET method to the Router and binds the HelloHandler to a URI path: "/hello".
+
+<pre>
+        router.get("/hello").handler(helloHandler);
+</pre>
+
+In the example above, the Router dispatches requests to the processing handler when a request comes in that matches the HTTP method and URI path. A router can be configured to dispatch requests to different handlers for every HTTP method (GET, POST, PUT, DELETE, PATCH) and endpoints that the API defines and the Microservice implements. This Router is registered with an instance of HttpServer, an efficient web server that ships with Vert.x, which can be configured to listen on a specific port.
+
+</p></p>
+
+Because most operations in Vert.x are asynchronous, such as <code>vertx.createHttpServer()</code>, success needs to be checked to complete the Verticle start process.
+
+<pre>
+        if (result.succeeded()) {
+            future.complete();
+        } else {
+            future.fail(result.cause());
+        }
+</pre>
+
+The calls to Future.complete() and Future.fail() are used to notify the Vert.x engine that initialization of the Verticle was a success or failure in the start process.
+
+</p></p>
+
+Running the HelloVerticle above should log the following message to System.out:
+
+<pre>
+INFO: Succeeded in deploying verticle
+</pre>
+
+And produces a JSON response:
+
+<pre>
+$ curl http://localhost:8081/hello
+{ "rsp" : "Hello world" }
+</pre>
+
+Some features and strengths in the Vert.x toolkit include:
+
+<ul>
+    <li>A "reactive", event-driven application model in which components send messages or events to each other</li>
+    <li>The engine remains idle or sleeps if no work needs to be done (no CPU utilization costs)</li>
+    <li>Encourages loose coupling between message senders and message receivers</li>
+    <li>Better performance when a very large number of requests need to be served in parallel</li>
+    <li>Polyglot: Vert.x can execute Java, JavaScript, Ruby, Python and Groovy</li>
+</ul>
+
+In addition, the microservices team provides a set of Vert.x utilities and reusable classes that can be used by microservices that are implemented using Vert.x. To leverage these utilities, add the following dependency to your <code>build.gradle</code>, using the correct version:
+
+<pre>
+dependencies {
+  mssproject(name: 'common_vertx_ms_utils', version: '2.0')
+}
+</pre>
+
+<b>Note:</b> Vert.x is built on <a href="https://netty.io/" target="_blank">Netty</a>. Use of Vert.x as a dependency in a microservice pulls in a number of other dependencies into the container image that is deployed to a container platform. As a result, Vert.x makes the container image much larger, slows down the CI/CD process, and has the potential to add a substantial cost to the organization while addressing CVE's reported against Vert.x jar files. Development teams are encouraged to give careful consideration to these trade-offs before adopting Vert.x for their microservice projects.
+
+</p></p>
+
+<h2 class="uk-h3 tm-heading-fragment">System Level Endpoints</h2>
+
+In addition to the implementation of API methods and corresponding endpoints, microservices <i>must</i> implement two system level endpoints: 1) /check and 2) /swagger. System level endpoints are used internally. These endpoints should not be exposed by the API's public interface, and as such, should not appear in the APIs swagger definition. They are essentially "hidden" and only intended to be used internally.
+
+<h3 class="uk-h3 tm-heading-fragment">Readiness and Liveliness Checks</h3>
+
+An implementation of a <code>/check</code> endpoint maps to the settings defined in ibm-meta.yaml to provide the container orchestrator with an API call that provides an indication about whether or not the microservice is alive and ready to service requests. Typically, the endpoint:
+
+<pre>
+http://localhost:1080/check
+</pre>
+
+Returns 200 OK if the API is alive and ready, or a non-200 response code otherwise. A non-200 response code indicates to the container orchestrator that Kubernetes should kill the container. A new container should be started instead, because a restart policy says so. This is a liveliness check.
+
+Similarly, if the readiness probe fails, then the endpoint's controller should remove the pod’s IP address from the endpoints of all services for that pod. The readiness and liveliness probes may be implemented differently, but generally are the same. If different, for example <code>/ready</code> for readiness and <code>/check</code> for liveliness, should simply be implemented and defined as such in ibm-meta.yaml.
+
+<h3 class="uk-h3 tm-heading-fragment">Swagger</h3>
+
+Microservices <i>must</i> also provide an implementation of a <code>/swagger</code> endpoint that returns the full contents of the Swagger Definition for the API. Before the API Gateway forwards a request to an API, it fetches the microservice's swagger definition to process its security settings. For more details about API Security, and the corresponding sections in Swagger Definitions that are used to secure APIs, see <a href="" uri="Secure">API Security</a>. For example, a GET request is always sent by the API Gateway to:
+
+<pre>
+http://localhost:1080/swagger
+</pre>
+
+And is expected to return a 200 OK response code and the full swagger definition in the body of the response, as YAML:
+
+<pre>
+---
+swagger: "2.0"
+info:
+  description: Sample Swagger documentation for a Microservice API.
+  version: "1.0.0"
+  title: "Sample API"
+host: "localhost"
+basePath: "/micro/sample"
+schemes:
+- "https"
+- "http"
+paths:
+  /resource/{resourceId}:
+    get:
+      tags:
+      - "resource"
+      summary: "Find a resource"
+      description: "Returns a single resource"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "resourceId"
+        in: "path"
+        description: "ID of resource to return (e.g., \"123\")"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Successful operation"
+</pre>
+
+<b>Note:</b>The absence of a functional implementation of <code>/check</code> and/or <code>/swagger</code> system level endpoints will cause the Microservice API to be non-serviceable in the microservices environment. An implementation of <code>/check</code> and <code>/swagger</code> must not require authentication to return a response.
+
+</p></p>
+
+
+<h2 class="uk-h3 tm-heading-fragment">Next Steps</h2>
+
+This section covered several options for teams to select a framework (if any) and a programming language for their projects. Microservice developers are highly encouraged to keep things light and simple. These are "micro" services, not "macro" services. They are meant to be small, portable, easy to write, simple to understand, and inexpensive to replace. The container platform in which container images are deployed into running Pods, provides a wide range of features to scale microservices. Use of a heavy framework inside of a container orchestrator may just be overkill and unnecessary. It's also likely that any performance gains a framework claims to deliver will never be realized inside of a container orchestrator like Kubernetes.
+
+</p></p>
+
+That being said, with an implementation approach selected, a good technical rationale to support it, and the implementation completed, microservice developers may take the next step in the developer's workflow: <a href="" uri="Write Run Tests"> Write & Run Tests</a>.
+
+</p></p>

@@ -1,0 +1,50 @@
+<h2 class="uk-h2">Getting Started</h2><script>if (document = top) window.location.href = "../index.html";</script>
+
+<div>By Alex Rodriguez | Updated June 01, 2020</div>
+
+</p></p>
+
+Microservices Docs is a collection of articles intended to guide developers step-by-step through the Microservices Development process. The articles are grouped and organized around a specific workflow. The goal of the documentation is to simplify Microservices development and to enable more teams to leverage the microservices environment. The documentation is divided into four sections: 1) Overview, 2) Workflow Steps, 3) Advanced Topics, and 4) FAQ
+
+</p></p>
+
+<h3 class="uk-h3 tm-heading-fragment">Microservice Developer Workflow</h3>
+
+The workflow defined here suggests that development of a Microservice begins with the design of a RESTful API. Teams working on  Microservices are usually driven by the needs of the business. The Microservice Developer's role, and this workflow, begins with the translation of business needs into a design for a RESTful API.
+
+</p></p></p></p>
+
+<div align="center"><img src="images/workflow.png" width="750"/></div>
+
+</p></p></p></p>
+
+Given the approach to begin Microservices development by designing an API, some readers may ask if there is a step missing before design. What about analysis? How do I know what my API should expose if the workflow doesn't include a step to analyze business needs? If this question is in the reader's mind, then your project may not be ready to begin this workflow. A clear articulation of business needs for a Microservice formulated as a Jira Epic, or as a set of Jira Stories (or some equivalent), is expected to be prepared before the Microservice Developer Workflow starts.
+
+<h3 class="uk-h3 tm-heading-fragment">Workflow Stages</h3>
+
+<h4>Design</h4>
+
+Step one in the worklow is <a uri="Define API">Define API</a>. The <a href="https://www.openapis.org/" target="_blank">Open API Initiative (OAI)</a> was created as a standard for REST API descriptions across vendors. The Swagger 2.0 specification was  donated by SmartBear Software directly to the OAI as the basis for the OpenAPI Specification (OAS). The OAS provides guidelines for REST API design that suggest a <i>contract-first</i> approach, rather than an <i>implementation-first</i> approach. Contract-first means the API contract (the interface) is designed first before writing code that implements the contract. Microservices are based on OAS and follow this approach.
+
+</p></p>
+
+Because design and documentation are interrelated, the <a uri="Document">Document API</a> step is included in the Design stage of the workflow. As the section on Document API suggests, a full pass at the documentation for an API helps developers to think through the way an API is <i>presented</i> to others. This step is expected to sharpen the design that developers would like others to see and use.
+
+<h4>Setup</h4>
+
+The Setup stage of the workflow is all about preparing a GitHub repository for the CI/CD process. The <a uri="Create a Repo">Create a Repo</a> step goes over a template repository that contains pre-defined sources for the configuration files that drive the CI/CD build and deployment process.
+
+<h4>Develop</h4>
+
+The Develop stage gets into the <a uri="Implementation">Microservice Implementation</a> step of the workflow. The microservices environment is designed to support multiple development frameworks and programming languages. When a team works independently on a  , microservice, the team is enabled to make their own implementation decisions without any major coordination and consensus across the entire organization. The microservices environment is designed with this implementation goal in mind. During the Develop stage, teams may also give consideration to the <a uri="Secure">API Security</a> step.
+
+<h4>Test</h4>
+
+The Test stage of the workflow proposes a multi-layered approach to testing Microservices. This approach takes a lot of the guess work out of test failure analysis and is expected to simplify end-to-end testing. For details see <a uri="Write Run Tests">Write & Run Tests</a>. For end-to-end testing details using Swagger UI, see <a uri="API Explorer">API Explorer</a>.
+
+<h4>Deploy</h4>
+
+The Deploy stage covers the <a uri="Build Deploy">Build & Deploy</a> step in the Microservice Developer's workflow, including the CI/CD build process, the use of feature branches, and the relationship between a repository name, F5 URLs, and the internal request forwarding that takes place when the API Gateway receives Microservice API calls.
+
+</p></p>
+

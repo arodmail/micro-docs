@@ -1,0 +1,271 @@
+<h2>API Security</h2><script>if (document = top) window.location.href = "../index.html";</script>
+
+<div>By Alex Rodriguez | Updated June 01, 2020</div>
+
+</p></p>
+
+When a request is sent to a Microservice API, the API Gateway first <i>authenticates</i> the user, then <i>authorizes</i> the request. This section is intended to expose the different authentication mechanisms that are supported by Microservices and to explain settings that Microservice Developers may configure to drive authorization decisions. Both security aspects of an API, authentication and authorization, play critical roles in establishing the security posture for an API. Proper use of API security prevents unauthorized access. Improper use may lead to a <b>security incident</b>. Reading through this section carefully to understand how to setup API Security is highly recommended as the final step in the developer's workflow.
+
+<h3 class="uk-h3 tm-heading-fragment">Authentication</h3>
+
+When a request is sent to a Microservice API, it first goes through the API Gateway for <i>authentication</i>.
+
+</p></p>
+
+The most common way to include credentials in a request is to use <b>HTTP Basic Authentication</b>, where an HTTP header containing a username and a password are separated by a colon and the combined string value is Base64 encoded, then prefixed by the word "Basic " and a space, and then sent to the API in an HTTP header called “Authorization".
+
+</p></p>
+
+To use HTTP Basic Authentication with <code>curl</code>, specify the username and password in a <code>-u</code> parameter:
+
+<pre>
+curl -X GET -u username:password https://services.sec.ibm.com/micro/{micro_name}
+</pre>
+
+For example:
+
+<pre>
+curl -v -u qatest:password https://services.sec.ibm.com/micro/sample/resources
+</pre>
+
+Generates the following HTTP request Headers, note the "Authorization" header and Base64 encoded value:
+
+<pre>
+> GET /micro/sample/resources HTTP/1.1
+> Host: services.sec.ibm.com
+> Authorization: Basic cWF0ZXN0OnBhc3N3b3Jk
+> User-Agent: curl/7.54.0
+> Accept: */*
+>
+< HTTP/1.1 200
+</pre>
+
+</p></p>
+
+<h3 class="uk-h3 tm-heading-fragment">Authentication Credentials</h3>
+
+Requests sent to a Microservice API may be authenticated using any of the following types of credentials:
+
+<h4 class="uk-h4 tm-heading-fragment">1. Customer Contact</h4>
+
+Authentication for Customer Contact matches a username and a password in a Remedy schema called "HD:Customer Contacts".
+
+<pre>
+curl -X GET -u username:password https://services.sec.ibm.com/micro/{micro_name}
+</pre>
+
+<h4 class="uk-h4 tm-heading-fragment">2. Active Directory User</h4>
+
+Active Directory is a directory-based identity service that holds MSS usernames and passwords. Administrative users are recognized by an "admin/" prefix appended to a username. Authentication for Active Directory checks the submitted username:password credentials and determines whether the user is an administrator or a normal user.
+
+<pre>
+curl -X GET -u admin/username:password https://services.sec.ibm.com/micro/{micro_name}
+</pre>
+
+<h4 class="uk-h4 tm-heading-fragment">3. W3id User</h4>
+
+IBMers may authenticate by submitting W3id credentials. Authentication for a W3id user checks the submitted username:password against BluePages, and IBM LDAP service.
+
+<pre>
+curl -X GET -u username@us.ibm.com:password https://services.sec.ibm.com/micro/{micro_name}
+</pre>
+
+<h4 class="uk-h4 tm-heading-fragment">4. MSS Token</h4>
+
+Authentication for an encrypted MSS token checks an <code>MSSToken</code> username and <code>token</code> (instead of a password)  against the token databases for the dev, stg, and/or prod environments where a request is sent. This form of authentication is compatible with monolithic services.
+
+</p></p>
+
+<b>Note</b>: MSS tokens may be restricted by IP range. MSS tokens may also be created to expire at a certain date/time. In some cases, these security restrictions may be necessary to limit and control the use of a token from a specific IP range and only  during a specified time period.
+
+</p></p>
+
+To authenticate using a token, send "MSSToken" as the username and the token value as the password.
+
+<pre>
+curl -X GET -u MSSToken:token https://services.sec.ibm.com/micro/{micro_name}
+</pre>
+
+</p></p>
+
+<h3 class="uk-h3 tm-heading-fragment">Bearer Authentication</h3>
+
+The <b>Bearer Authentication</b> scheme can be used as an alternative to Basic Authentication. Generally, before an application can get a response from a microservice, it must first authenticate using its own credentials. In Bearer Authentication, credentials (any of the types listed above) are verified against an identity store, and exchanged for a token. The token, a Json Web Token (JWT), represents a scope, a duration, and other <i>claims</i> that are granted by the authentication and grants access to the same resources that are granted to the credentials. An application that authenticates using this scheme may send requests to microservices by presenting the token.
+
+</p></p>
+
+To exchange credentials for a JWT, an application sends a request to the <a href="https://services.sec.ibm.com/api_explorer/swagger-ui/?url=https://services.sec.ibm.com/api_explorer/swagger/authentication" target="_blank">Authentication API</a>:
+
+<pre>
+curl -v -X POST https://services.sec.ibm.com/micro/authentication/login?user=username -d 'password'
+</pre>
+
+The response headers include a <code>X-secibm-jwt</code> header that contains the JWT token value:
+
+<pre>
+< HTTP/1.1 200
+< Set-Cookie: JSESSIONID=2265B47C487DC015CD155295EC379EF9; Path=/; HttpOnly
+< X-secibm-jwt: &lt;token_value&gt;
+< Access-control-allow-headers: Content-Type, api_key, Authorization
+< Date: Wed, 31 Dec 2030 23:59:59 GMT
+< Access-control-allow-methods: GET, POST, DELETE, PUT, PATCH, OPTIONS
+< Access-control-allow-origin: *
+< Access-Control-Allow-Credentials: true
+< Access-Control-Expose-Headers: Location
+< Content-Type: application/json;charset=UTF-8
+< Transfer-Encoding: chunked
+< Strict-Transport-Security: max-age=15768000
+</pre>
+
+To present a JWT using the Bearer Authentication scheme, an application sends an HTTP header called "Authorization" in which the value is prefixed by the word "Bearer " a space, followed by the JWT value:
+
+<pre>
+curl -X GET -H "Authorization: Bearer &lt;token_value&gt;" https://services.sec.ibm.com/micro/{micro_name}
+</pre>
+
+A JWT is valid for a short time period (10 minutes), and removes the need for Authenticators to verify credentials against an identity store on each and every request. Bypassing credentials validation by using a JWT has huge performance benefits. For this reason, Bearer Authentication is recommended for high volume applications, for example, applications that poll microservices on short intervals. The recommended approach to authenticate in these cases is for the application to loop over steps 1 and 2:
+
+</p></p>
+
+<pre>
+1) exchange credentials for a JWT
+2) use the JWT until it expires
+</pre>
+
+</p></p>
+
+When a JWT expires, the response code from a request sent to a microservice is <code>401</code> and the response body is expected to be:
+
+<pre>
+{"code" : 401, "message" : "Unauthenticated"}
+</pre>
+
+</p></p>
+
+
+<h3 class="uk-h3 tm-heading-fragment">Authorization</h3>
+
+When a request is sent to a Microservice API, and it goes through the API Gateway for authentication without errors, then the API Gateway attempts to <i>authorize</i> the request. API Authorization takes into consideration a user's membership in a role and the permissions that are associated with that role to make authorization decisions. Authorization for APIs may be configured through Swagger vendor extensions. This section explains the elements to add to a Swagger definition, how they are interpreted by the API Gateway and by the Secure Proxy sidecar at authorization time.
+
+<h4 class="uk-h4 tm-heading-fragment">Enable API Security</h4>
+
+The following top-level API Security section must be included in an API Swagger specification to declare security settings for the API:
+
+<pre>
+x-mss-security:
+  enabled: true
+  api-security-level: customer
+</pre>
+
+The top-level <code>x-mss-security</code> declares security for the API as a whole. This section has two nested fields, 1) <code>enabled</code>, which may be <code>true</code> to enable authorization checks, <code>false</code> to disable them, and 2) <code>api-security-level</code> may be one of:
+
+<ul>
+  <li><code>privileged</code> - only privileged users are authorized to make API calls</li>
+  <li><code>customer</code> - users are only authorized to access customer data based on their permissions and roles</li>
+  <li><code>public</code> - normal users and privileged users are authorized to make API calls, the API is not subject to authorization</li>
+</ul>
+
+<h4 class="uk-h4 tm-heading-fragment">Secure Proxy Config</h4>
+
+The <code>x-mss-permissions</code> section is included in an API Swagger definition to provide protection against cross-customer data contamination on the way in, and to protect against customer data leaks on the way out. The purpose of this section in an API Swagger definition is to provide the Secure Proxy with a field mapping that drives inbound request and outbound response security scanning.
+
+<pre>
+x-mss-permissions:
+  - customerId: customerId
+  - deviceId: deviceId
+  - deviceIds: deviceIds
+  - ticketIssueTypes: issueTypes
+</pre>
+
+The <code>x-mss-permissions</code> section is read by the <a href="" uri="Secure Proxy">Secure Proxy</a> deployed as a sidecar to scan and filter the payload for an inbound API request (HTTP POST, PUT, and PATCH) to verify that the values in the payload match a Customer ID, Device ID, and Ticket Issue Type that the user has permission to update. These values are also used to scan outbound response payloads for Customer ID, Device ID, and Ticket Issue Type to verify that the user has permission to access (read) all values included in the response payload (HTTP GET).
+
+</p></p>
+
+In the example below, a <code>customerId</code> field is mapped to a <code>customerId</code> field:
+
+<pre>
+x-mss-permissions:
+  - customerId: customerId
+</pre>
+
+In this example, the <code>customerId</code> on the left side of the mapping is the name of a field defined in permissions that the Secure Proxy scans for, and the <code>customerId</code> on the right side of the mapping is the name of a field that contains the value to protect in a response payload from the Microservice. So if the Microservice response payload contains a Customer ID under the field name "CID", then the Secure Proxy scans the payload for the mapped field, "CID". The same is true for deviceId, deviceIds, and ticketIssueTypes in the example above, these may be mapped to the same field name or to a different one. This example might be something used in the Swagger definition for a Microservice API that touches several permissions, and generates multi-entity responses, such as the Ticket API.
+
+</p></p>
+
+<b>Note</b>: The <code>x-mss-permissions</code> section is only applicable when the top level security level is set to "customer", like this:
+
+<pre>
+x-mss-security:
+  enabled: true
+  api-security-level: customer
+</pre>
+
+</p></p>
+
+<h4 class="uk-h4 tm-heading-fragment">URI Path Scanning</h4>
+
+The <code>x-mss-permissions-uri</code> section is read by the Secure Proxy to determine whether to scan URI path parts for security sensitive elements.
+
+<pre>
+x-mss-permissions-uri:
+  - /customer: customerId
+</pre>
+
+For example, given an API request URL:
+
+<pre>
+https://services.sec.ibm.com/micro/customer/P000000614
+</pre>
+
+</p></p>
+
+The <code>x-mss-permissions-uri</code> above tells the Secure Proxy to look for a <code>customerId</code> in the URI paths, where it could appear in different path parts, but always after <code>/customer</code>:
+
+<pre>
+/customer/P000000614
+/customer/P000000614/foo
+/customer/P000000614/foo/123
+/foo/123/customer/P000000614
+</pre>
+
+The <code>/customer</code> part of the <code>x-mss-permissions-uri</code> specifies the part of the URI path that precedes the location of the Customer ID on the path. This enables the Secure Proxy to locate the security sensitive element on the path and to match it to entities defined in permissions for the user sending the request. If the security sensitive element, for example a Customer ID, is allowed for the user then the Secure Proxy authorizes the request, otherwise the Secure Proxy generates an authorization error to prevent the request from going through.
+
+</p></p>
+
+<b>Note</b>: The <code>x-mss-permissions-uri</code> section is only applicable when <code>api-security-level</code> is set to "customer".
+
+<h4 class="uk-h4 tm-heading-fragment">HTTP Method Security</h4>
+
+At the HTTP method level (GET, POST, PUT, DELETE, and PATCH) authorization can be granted to a specific user role to execute a method. For example,
+
+<pre>
+paths:
+  "/resources":
+    get:
+      x-mss-api-scopes:
+      - "mssresource:read"
+</pre>
+
+The example above restricts GET requests sent to the <code>/resources</code> path to users who belong to the <code>mssresource:read</code> role. These roles are currently defined in global configuration file hosted by the Authorization Engine repository in GitHub.
+
+</p></p>
+
+For the full configuration file, see https://gitlab.sec.ibm.com/xps-services/authorization_ms/blob/master/src/main/resources/GroupRolesToPermissionsMapping.json
+
+</p></p>
+
+This configuration file maps to groups that are defined in Remedy. The Remedy groups are found in the <code>OPS: Group Definition</code> schema, where new groups can be created. MSS users are added to these groups from the User schema, Menus/Roles tab, Permission Groups section. Customer Contact users are added to groups from the <code>HD:Customer-Contacts</code> schema, MSS Portal Details tab, Permission Groups section.
+
+</p></p>
+
+For APIs that are avaialble to the public, <code>x-mss-api-scopes</code> accepts a reserved role name: <code>public</code>, such that any user on the internet can can access the method for the specified path, for the specified Microservice API:
+<pre>
+paths:
+  "/resources":
+    get:
+      x-mss-api-scopes:
+      - "public"
+</pre>
+
+</p></p>
+

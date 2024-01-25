@@ -1,0 +1,242 @@
+<h2>FAQ</h2><script>if (document = top) window.location.href = "../index.html";</script>
+
+<b>How do I view a Microservice in Dev, Stg, or Prd?</b>
+
+</p></p>
+
+The web-based Dashboard is a Kubernetes user interface. You can login to the Dashboard to get an overview of the applications running in the cluster and to view the status of a specific Pod. Microservices that are deployed to dev can be viewed in the "integration" namespace.
+
+</p></p>
+
+Obtain credentials from the ITPO team to login to the Kubernetes Dashboard:
+
+</p></p>
+
+<ul>
+    <li><a href="https://dashboard.dal09-dev.k8s-lab.sec.ibm.com/#!/pod?namespace=integration" target="_blank">Dev</a>
+    </li>
+    <li><a href="https://dashboard.atl-stg.k8s.sec.ibm.com/#!/pod?namespace=master" target="_blank">Stg</a>
+    </li>
+    <li><a href="https://dashboard.atl-prd.k8s.sec.ibm.com/#!/pod?namespace=master" target="_blank">Prd</a>
+    </li>
+    <li><a href="https://dashboard.fra02-prd.k8s.sec.ibm.com/#!/pod?namespace=master" target="_blank">EU</a>
+    </li>
+</ul>
+
+</p></p>
+
+Note: The Kubernetes Dashboards in dev, stg, and prd may use self-signed Certificates for https. If you get a warning about this when you first visit the links above. You can bypass the warning as follows:
+
+</p></p>
+
+On the warning page, click "Advanced", then "Add Exception ...". A new dialog will appear that describes the untrusted Certificate. Click "Confirm Security Exception" to trust the host for the Kubernetes cluster, and then reload the page.
+
+</p></p>
+
+<b>How do I deploy a Microservice to Stg?</b>
+
+</p></p>
+
+See "Deploy an Application" in the <a href="https://w3-connections.ibm.com/wikis/home?lang=en#!/wiki/Wbfbcbf22d30b_4f69_883a_faa78103e88a/page/Users%20Guide%20(CCMSV2)" target="_blank">ITPO Platform Documentation Kubernetes User Guide</a>
+
+</p></p>
+
+<b>How do I view the logs for a Microservice?</b>
+
+</p></p>
+
+The logs for a microservice are viewable and searcheable through Kibana:
+
+<ul>
+    <li><a href="https://ibm.biz/BdqvXU" target="_blank">Kibana Dev</a>
+    </li>
+    <li><a href="https://ibm.biz/BdzmiC" target="_blank">Kibana Stg</a>
+    </li>
+    <li><a href="https://ibm.biz/BdzmiQ" target="_blank">Kibana Prd</a>
+    </li>
+    <li><a href="https://ibm.biz/BdzY59" target="_blank">Kibana EU</a>
+    </li>
+</ul>
+
+An alternate way to view logs for microservices is through the web-based Kubernetes Dashboard:
+
+</p></p>
+
+Sign in > Namespace "integration" | "master" > Pods > [Your Pod Name] > Logs
+
+</p></p>
+
+For Microservices that use the Log4j2 Console Appender, all output written the Log4j2 Logger will appear in the Logs viewer. If the Microservice is written in Java and includes System.out.println() statements, the output from these statements also appears in the Logs viewer. The viewer drills down logs from containers of a single Pod.
+
+</p></p>
+
+<b>Why doesn't my Microservice appear in the API Explorer Main page?</b>
+
+</p></p>
+
+APIs that are registered in the API Registry do not automatically appear on API Explorer's Main Page. The API Registry is an Elastic Search index that stores information about and categorizes APIs based on their intended use. The API Gateway automatically registers APIs into the API Registry but does not auto-Publish an API. To manually Publish an API see <a href="" uri="API Explorer">API Explorer</a> >  API Registry.
+
+</p></p>
+
+Permissions may also cause an APIs not to appear on API Explorer's Main Page. Unprivileged users only see unprivileged APIs on the Main Page. Check if you are logged in to API Explorer as a privileged user to see all APIs.
+
+</p></p>
+
+<b>How do I grow the number of Pods for my Microservice?</b>
+
+</p></p>
+
+In order to meet higher performance demands and to support traffic increases, your Microservice needs to scale up. For details see "Running Multiple Instances of Your App":
+
+</p></p>
+
+<a href="https://kubernetes.io/docs/tutorials/kubernetes-basics/scale/scale-intro/" target="_blank">https://kubernetes.io/docs/tutorials/kubernetes-basics/scale/scale-intro/</a>
+
+</p></p>
+
+To automatically grow the number of Pods based on observed metrics such as CPU utilization, Kubernetes provides Horizontal Pod Autoscalers (HPA). For an overview of HPA see:
+
+</p></p>
+
+<a href="https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/" target="_blank">https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/</a>
+
+</p></p>
+
+Note that the use of HPA in the Kubernetes clusters in dev, stg, and prd is not yet fully supported by the ITPO Team. ITPO has a request in their queue to add support for Horizontal Pod Autoscalers through the ibm-meta.yaml file (or some equivalent) in:
+
+</p></p>
+
+<a href="https://jira.sec.ibm.com/browse/ITPO-4246" target="_blank">ITPO-4246</a>
+
+</p></p>
+
+<b>How do I make sure that all pods for my microservice are running the same version?</b>
+
+</p></p>
+
+For details about running multiple Pods for the same microservice, see links above about auto-scaling. The short answer is that in auto-scaling, Kubernetes deploys containers from a "ReplicaSet" that points to one version of a container image, the version that gets replicated. When an update is pushed to the ,icroservice's repository in GitHub, the CI/CD build process generates a new container image version that replaces the version of the image the microservice's ReplicaSet points to. This means only the latest version gets replicated from a ReplicaSet.
+
+</p></p>
+
+<b>How is fail over handled?</b>
+
+</p></p>
+
+In the Kubernetes cluster on dev, stg, and prd, microservices have an Ingress that exposes a URL to which the API Gateway can forward requests. In cases where readiness and/or liveliness probes for a Pod container fail (a container is not ready to accept traffic), then Kubernetes automatically removes a failed Pod from its Service load balancers and replaces it with one or more fail-over replica Pods. Subsequent requests forwarded by the API Gateway to the Ingress URL are then re-directed to fail-over replica Pods.
+
+</p></p>
+
+<b>Are Pods load balanced?</b>
+
+</p></p>
+
+An Ingress sits in front a Service and acts as a "smart router" or entry-point to the Pods that are associated with the Service. Load balancing across containers of the same type is done using using a label and a selector for the label. By default, a round-round-robin algorithm load-balances traffic across containers of the same type.
+
+</p></p>
+
+<b>Is there a multi-region, multi-dc, and/or multi-rack option? If so how do I set that up?</b>
+
+</p></p>
+
+Most likely the ITPO Team and Infrastructure Team can set this up.
+
+</p></p>
+
+<b>If the pods are load balanced or more than one pod can receive traffic at the same time, how do I make sure that only those pods on the latest version get traffic?</b>
+
+</p></p>
+
+The CI/CD build process generates a new container image version that replaces the version of the image that runs in a Pod. This means only the latest version of the container image will be running at any given time.
+
+</p></p>
+
+To run multiple different versions of a microservice at the same time, deployment to a features branch is supported on dev. Feature branches are deployed into their own namespace in the Kubernetes cluster on dev. To send a request to the version of a container image built from a features branch, the following URL scheme is supported by the API Gateway:
+
+</p></p>
+
+<pre>
+https://dal09-dev-services.sec.ibm.com/micro/customer.XPS-9999/P000000614
+</pre>
+
+</p></p>
+
+Where "customer" is the microservice name, and "XPS-9999" is the features branch name, using a "." delimiter in between the two parts. The API Gateway recognizes the URL scheme and forwards requests to the Ingress URL that is created in the Kubernetes cluster on dev when a features branch is deployed there.
+
+</p></p>
+
+<b>For API Gateway to route calls to my microservice, should I have -ms or _ms in the name of my service?</b>
+
+</p></p>
+
+Your service name can be whatever you want it to be. The API Gateway supports a simple algorithm to resolve an HTTP request into an Ingress URL to forward to, that tries to add an "-ms" suffix to the Microservice name if it is not included in the request URL. Otherwise, the algorithm resolves an Ingress URL without the suffix.
+
+</p></p>
+
+<b>Do Microservices follow any kind of field naming conventions?</b>
+
+</p></p>
+
+Yes.
+
+</p></p>
+
+To help standardize field naming across Microservices, developers are highly encouraged to adopt some conventions. This guidance is primarily intended to help prevent cases in which one microservice calls a date field <code>LastModifiedDate</code> and another calls it <code>LastModifiedOn</code>, and yet another uses <code>DateLastModified</code>. Instead, uniformity across field names helps to process fields programmatically based on the data type their name implies. In some cases, as with Enum fields, naming conventions have sorting implications, for example, rather than standard alphanumeric sorting by a default field, a custom sort order can be applied when the Enum data type for a field is known by its name. In other cases, text fields that follow a naming convention indicate that records are matched by full-text searches when a search term is found anywhere inside the field value. For these reasons, the following table defines some field naming conventions to follow.
+
+</p></p>
+
+<table class="table">
+    <tr>
+        <th>Type</th><th>Naming Convention</th><th>Description</th><th>Sample JSON</th>
+    </tr>
+    <tr>
+        <td>Primary Key</td><td>Field should be called "id"</td><td>The primary key or unique identifier for a resource. </td><td><code>{ "id": "P000000614" }</code></td>
+    </tr>
+    <tr>
+        <td>Foreign Key</td><td>Suffixed by "Id"</td><td>The foreign key of a resource referenced by another. </td>
+        <td>
+            <code>{ "deviceId": "P00000008028750" }</code>
+            <code>{ "partnerId": "CIDS705057" }</code>
+        </td>
+    </tr>
+    <tr>
+        <td>Date</td><td>Suffixed by "Date"</td><td>A date/time field</td>
+        <td>
+            <code>{ "createDate": "2030-12-31T12:00:00.000Z" }</code>
+            <code>{ "lastModifyDate": "2030-12-31T12:00:00.000Z" }</code>
+            <code>{ "deactivatedDate": "2030-12-31T12:00:00.000Z" }</code>
+        </td>
+    </tr>
+    <tr>
+        <td>Enum</td><td>Suffixed by "Val" or "Type"</td><td>Field value is from a predefined list of values.</td>
+        <td>
+            <code>{ "statusVal": "ACTIVE" }</code>
+            <code>{ "ticketIssueType": "CUSTOMER_REPORTED_INCIDENT" }</code>
+        </td>
+    </tr>
+    <tr>
+        <td>IP Address</td><td>Suffixed by "IpAddr"</td><td>Field value is an IP Address</td>
+        <td>
+            <code>{ "externalIpAddr": "207.231.140.63" }</code>
+        </td>
+    </tr>
+    <tr>
+        <td>Email Address</td><td>Suffixed by "Email"</td><td>Field value is an Email Address</td>
+        <td>
+            <code>{ "contactEmail": "yourname@us.ibm.com" }</code>
+        </td>
+    </tr>
+    <tr>
+        <td>URL</td><td>Suffixed by "URL"</td><td>Field value is a URL</td>
+        <td>
+            <code>{ "launchURL": "http://www.ibm.com/" }</code>
+        </td>
+    </tr>
+    <tr>
+        <td>Indexed</td><td>Suffixed by "Text"</td><td>Field value is full-text searchable</td>
+        <td>
+            <code>{ "ticketDescriptionText": "Lorem ipsum dolor sit amet" }</code>
+        </td>
+    </tr>
+</table>
+
+</p></p>

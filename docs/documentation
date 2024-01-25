@@ -1,0 +1,152 @@
+<h2>Document APIs</h2><script>if (document = top) window.location.href = "../index.html";</script>
+
+<div>By Alex Rodriguez | Updated June 01, 2020</div>
+
+</p></p>
+
+The importance of a well documented API for business critical applications cannot be overstated. When API developers communicate with accuracy and precision about an interface, attention to the documentation accelerates the business. A poorly documented API has the opposite effect on the business: gaps in the documentation cause project delays, lack of clarity leaves integration teams scratching their heads, and empty thinking about an API, without documented support, drags teams into lengthy consultations with API developers for basic usage questions. As a result, costs associated with poorly documented APIs add up.
+
+</p></p>
+
+The <a href="https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md" target="_blank">Open API
+  Specification</a> provides some key fields that are specifically intended for API documentation purposes, to describe clearly how an API works. This section focuses on these key fields.
+
+<h2 class="uk-h3 tm-heading-fragment">API Description</h2>
+
+The top "info" object of an Open API Specification contains a <code>description</code> field used as a top-level API description. Simple, read only APIs with a single GET method may provide a short, one or two sentence description. While complex APIs that expose multiple HTTP methods, GET, POST, PUT, DELETE, and PATCH, need to provide additional documented support to get the concepts across to API Consumers and to Application Developers who are the intended audience of the API documentation.
+
+</p></p>
+
+For complex APIs <a href="https://spec.commonmark.org/" target="_blank">CommonMark syntax</a> is supported inside the <code>description</code> field that renders in Swagger Editor and in Swagger UI.
+
+</p></p>
+
+An example of using basic markdown in an OpenAPI (Swagger) document is shown below that may be copied into <a href="https://editor.swagger.io/" target="_blank">Swagger Editor</a> to try it:
+
+<pre>
+---
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: API Registry
+  description: |
+   # Heading
+
+   Text attributes _italic_, *italic*, __bold__, **bold**, `monospace`.
+
+   Horizontal rule:
+
+   ---
+
+   Numbered list:
+
+     1. apples
+     2. oranges
+     3. pears
+
+   Bullet list:
+
+     * apples
+     * oranges
+     * pears
+
+   An image:
+   ![Swagger logo](https://raw.githubusercontent.com/swagger-api/swagger-ui/master/dist/favicon-32x32.png)
+
+   A [link](http://example.com).
+
+   Code block:
+
+   ```
+   {
+     "status": "ok"
+   }
+   ```
+paths:
+  "/api":
+    get:
+      tags:
+        - "API"
+      summary: Find APIs
+      description: "Returns a single resource"
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: Successful operation
+
+</pre>
+
+<b>Note</b>: API Developers are encouraged to use basic markdown to prepare an API description to be read by others. Formatting not only helps make the text easy to read, but also plays a critical role in earning the readers interest. The reader should be able to extract key pieces of information from a well formatted API description. Points should be laid out clearly and consistently. If they are not, then the reader may misinterpret technical details about the API leading to costly errors during an integration project.
+
+</p></p>
+
+Some markdown best practices:
+
+<ul>
+  <li>Use bullet points to lay out lists</li>
+  <li>If some words are more <b>important</b> than <u>others</u>, use the right <i>emphasis</i></li>
+  <li>Use monospaced font to highlight <code>code</code> and <code>keywords</code></li>
+</ul>
+
+<h2 class="uk-h3 tm-heading-fragment">API Methods</h2>
+
+Under the <code>paths:</code> section of an OpenAPI (Swagger) document, an API may support one or more HTTP Methods: get, post, put, delete, and/or patch. For every method supported within a path, two levels of documentation may be provided: 1) a short, one line <code>summary</code>, and 2) a full <code>description</code>:
+
+<pre>
+paths:
+  /resource/{resourceId}:
+    get:
+      tags:
+      - "resource"
+      summary: "Find a resource"
+      description: "Returns a single resource"
+</pre>
+
+The <code>summary</code> field is displayed on a single line and appears when the HTTP method is collapsed in Swagger Editor and in Swagger UI. The <code>description</code> field is intended to provide a full, multi-line, rich text formatted API Method description. The <a href="https://spec.commonmark.org/" target="_blank">CommonMark syntax</a> is supported inside the <code>description</code> field that renders in Swagger Editor/UI.
+
+<h2 class="uk-h3 tm-heading-fragment">API Method Parameters</h2>
+
+Each method parameter, depending on its importance to an API method call, may be documented in a short concise way or more fully in the parameter <code>description</code> field:
+
+<pre>
+parameters:
+  - name: "resourceId"
+    in: "path"
+    description: "ID of resource to return (e.g., \"4976288753526794000\")"
+    required: true
+    type: "integer"
+    format: "int64"
+</pre>
+
+Markdown is supported in the parameter <code>description</code> field.
+
+<h2 class="uk-h3 tm-heading-fragment">API Request/Response Body</h2>
+
+The request body typically contains a representation of a resource to be created using HTTP POST. A schema-like definition for the request/response body is included under the <code>definitions</code> section of an OpenAPI (Swagger) document:
+
+<pre>
+definitions:
+  resource:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        example: 4976288753526794000
+        description: A unique numeric id for a resource. If null, then a new id is automatically generated.
+      name:
+        type: "string"
+        example: AnyString
+        description: A name for a resource
+</pre>
+
+Each Object defined under <code>definitions</code> has a <code>properties:</code> element with one or more Object properties defined beneath it. Object properties may be fully documented in two ways: 1) by providing an example value through the <code>example</code> field and 2) by describing the property in a single or multi-line <code>description</code>.
+
+</p></p>
+
+Markdown is supported in the Object property <code>description</code> field.
+
+<h2 class="uk-h3 tm-heading-fragment">Next Steps</h2>
+
+This step in the Microservice Developer's workflow helps developers to clarify their thinking about an API. The documentation step should raise questions about every aspect of the API definition: does this API method really make sense? Is it reusable? Does the API serve only a specific purpose? How can I solve a bigger problem by generalizing the interface? With a completely documented API these questions should be resolved for API Consumers, Application Developers and for integrators to come up to speed quickly on API capabilities in a way that can be leveraged effectively for the business. With this step completed, microservice developers may take the next step in the developer's workflow: <a href="" uri="Secure">API Security</a>.

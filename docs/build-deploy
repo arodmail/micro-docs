@@ -1,0 +1,203 @@
+<h2>Build & Deploy</h2><script>if (document = top) window.location.href = "../index.html";</script>
+
+<div>By Alex Rodriguez | Updated June 01, 2020</div>
+
+</p></p>
+
+The Build & Deploy step in the Microservices Developer workflow ensures that all source code compiles, all tests pass, and the ,microservice source code repository is converted to a new container image that is deployed to a container platform. To run the build configuration locally before doing an initial commit and push into the repository, run <code>./gradlew build</code> from the same directory where the <code>build.gradle</code> file is located:
+
+<pre>
+$ ./gradlew build
+
+> Configure project :
+Using MSS Gradle plugins version 1.0.3-itpo-2460-k8s-SNAPSHOT built at 2019-06-26 15:27:36 +0000 (UTC)
+
+> Task :test
+
+com.ibm.sec.micro.TestSuite > com.ibm.sec.micro.test.MicroNodeUnitTest.test PASSED
+com.ibm.sec.micro.TestSuite > com.ibm.sec.micro.test.MicroNodeContractTest.test PASSED
+com.ibm.sec.micro.TestSuite > com.ibm.sec.micro.test.MicroNodeIntegrationTest.test PASSED
+
+--------------------------------------------------------------------
+|  Results: SUCCESS (3 tests, 3 successes, 0 failures, 0 skipped)  |
+--------------------------------------------------------------------
+
+
+BUILD SUCCESSFUL in 9s
+16 actionable tasks: 16 executed
+</pre>
+
+This step reads the <code>build.gradle</code> file and executes the build configuration. The build script defines the project and tasks to run. For example, JUnit tests that are located under <code>/src/test/java</code> are executed as part of the <code>test</code> task. The example above indicates that 3 tests, UnitTest, ContractTest, and IntegrationTest, run and pass. For more details about microservice tests see <a href="" uri="Write Run Tests">Write & Run Tests</a>.
+
+</p></p>
+
+<b>Note</b>: This step may be repeated as many times as needed to resolve compilation, dependencies, and test issues, until a BUILD SUCCESSFUL message is given by <code>./gradlew build</code>. It is highly recommended that this step completes without errors before moving onto the next steps.
+
+<h3>Push</h3>
+
+The CI/CD build process executes the build configuration on a build server when files are successfully pushed into the microservice repository. To trigger the CI/CD build process on the build server, commit and push all changes to the <b>integration</b> branch of the repository or to a features branch.
+
+<img src="../images/jenkins-pipeline-branch.png" />
+
+</p></p>
+
+You can create a features branch locally as long as you have initialized the repo as recommended in the <a href="" uri="Create a Repo">Create a Repo</a> step in the developer's workflow. From your terminal window, list the branches on your repository.
+
+<pre>
+$ git branch
+* master
+</pre>
+
+This indicates there is a single branch, the master and the asterisk indicates it is currently active.
+
+</p></p>
+
+Create a new feature branch in the repository
+
+<pre>
+$ git branch {feature_branch}
+</pre>
+
+In this case, <code>{feature_branch}</code> should be "integration" without the quotes. Switch to the feature branch to work on it.
+
+<pre>
+$ git checkout {feature_branch}
+</pre>
+
+You can list the branches again with the git branch command.
+
+</p></p>
+
+Then add, commit, and push changes to the <code>{feature_branch}</code> branch, again in this case "integration" without the quotes:
+
+<pre>
+$ git add .
+$ git commit -m "Initial commit"
+$ git push origin {feature_branch}
+</pre>
+
+<h3>CI/CD Pipeline</h3>
+
+When the <code>git push</code> command completes successfully without errors, the CI/CD Pipeline progress can be monitored in <a href="https://sec-mss-team-jenkins.swg-devops.com//">Jenkins</a> by navigating to the new microservice repository. The Jobs that run in a pipeline are configured in the <code>Jenkinsfile</code> file which include:
+
+<ul>
+    <li>Checkout</li>
+    <li>Compile</li>
+    <li>OSS Check</li>
+    <li>Test</li>
+    <li>Sonar</li>
+    <li>Quality Gate</li>
+    <li>Publish</li>
+</ul>
+
+<h3>Publish</h3>
+
+A Publish job in the CI/CD Pipeline deploys a new container image that is created from the compiled, tested, and scanned source code in the repository. Publish job deploys the image to a container platform. The tail end of the output for the job includes the following:
+
+<pre>
+Pushed image docker-registry.sec.ibm.com:5000/sample:1.0.80-integration-snapshot
+:deployToKubernetes
+I, [2019-10-08T15:52:51.641377 #1]  INFO -- : Waiting until service is ready
+I, [2019-10-08T15:53:53.796432 #1]  INFO -- : sample:1.0.80-integration-snapshot deployed successfully on namespace integration
+I, [2019-10-08T15:53:53.796926 #1]  INFO -- : Switching versions for application sample
+I, [2019-10-08T15:53:57.679381 #1]  INFO -- : Switch completed successfully
+I, [2019-10-08T15:54:00.050928 #1]  INFO -- : Deleting deploy/sample-f545925ye3
++-----------------------------+---------------------+---------+--------+---------+--------------------------+----------------------------------------------------------+
+|           Version           |   Deployment Date   | Healthy | Active | Passive | Deployment Configuration |                           URL                            |
++-----------------------------+---------------------+---------+--------+---------+--------------------------+----------------------------------------------------------+
+| 1.0.80-integration-snapshot | 2018-10-08 15:52:44 | true    | true   | false   | sample-f5j996aja0        | https://sample-integration.dal09-dev.k8s-lab.sec.ibm.com |
++-----------------------------+---------------------+---------+--------+---------+--------------------------+----------------------------------------------------------+
+:deployToOpenshift
+
+BUILD SUCCESSFUL in 2m 32s
+22 actionable tasks: 19 executed, 3 up-to-date
+</pre>
+
+In this example, the Publish Job successfully switches to and activates a new version of the application called <code>sample</code>. And the output includes a URL for a Kubernetes Ingress:
+
+<pre>
+https://sample-integration.dal09-dev.k8s-lab.sec.ibm.com
+</pre>
+
+
+<h3>Merge/Push to Master</h3>
+
+When a features branch is merged into master or a microservice developer sends a git push command into the master branch for the repository, then the CI/CD pipeline builds, scans and deploys a new container image to the master namespace in the container orchestrator.
+
+<img src="../images/jenkins-pipeline-master.png" />
+
+<h3>End-To-End</h3>
+
+Once the CI/CD Pipeline for a push to a microservice repo completes successfully, an application can send requests to the microservice API directly through the F5 Load Balancer in Dev. The F5 Load Balancer is configured to <i>route</i> requests that are sent to the <code>/micro</code> URI path prefix, to the API Gateway. And the API Gateway resolves and forwards requests to the Kubernetes Ingress URL for the microservice. In Dev, unless a specific <code>{feature_branch}</code> is included in the URL, the API Gateway automatically forwards requests to the "integration" branch build of the microservice.
+
+<h4>Dev</h4>
+
+<table class="table">
+    <tr>
+        <td>F5</td> <td>http://dal09-dev-services.sec.ibm.com/<b>micro</b>/<code>{repo_name}</code></td>
+    </tr>
+    <tr>
+        <td>API Gateway</td> <td>https://xpsws-gateway-integration.dal09-dev.k8s-lab.sec.ibm.com/<b>micro</b>/<code>{repo_name}</code></td>
+    </tr>
+    <tr>
+        <td>Kubernetes Ingress</td> <td>https://<code>{repo_name}</code>-integration.dal09-dev.k8s-lab.sec.ibm.com</td>
+    </tr>
+</table>
+
+</p></p>
+
+<b>Note</b>: To send a request to a different features branch other than "integration" in Dev, the following URL scheme is recognized by the API Gateway:
+
+<pre>
+https://dal09-dev-services.sec.ibm.com/<b>micro</b>/<code>sample</code>.<code>XPS-9999</code>/P000000614
+</pre>
+
+Where "sample" is the microservice name (or <code>{repo_name}</code>), and "XPS-9999" is the <code>{feature_branch}</code> name, using a "." delimiter in between the two parts. The API Gateway recognizes the URL scheme and forwards requests to the Kubernetes Ingress URL that is created in the Kubernetes cluster on Dev when a feature branch for a microservice repository is deployed there.
+
+</p></p>
+
+<h4>Stg</h4>
+
+For details about deployment of a Microservice to Kubernetes Stg, see <a href="https://w3-connections.ibm.com/wikis/home?lang=en-us#!/wiki/Wbfbcbf22d30b_4f69_883a_faa78103e88a/page/Users%20Guide%20(CCMSV2)" target="_blank">ITPO Platform Documentation - Users Guide (CCMSV2)</a>
+
+</p></p>
+
+<table class="table">
+    <tr>
+        <td>F5</td> <td>https://stg-services.sec.ibm.com/<b>micro</b>/<code>{repo_name}</code></td>
+    </tr>
+    <tr>
+        <td>API Gateway</td> <td>https://xpsws-gateway.atl-stg.k8s.sec.ibm.com/<b>micro</b>/<code>{repo_name}</code></td>
+    </tr>
+    <tr>
+        <td>Kubernetes Ingress</td> <td>https://<code>{repo_name}</code>.atl-stg.k8s.sec.ibm.com</td>
+    </tr>
+</table>
+
+<h4>Prod</h4>
+
+Deployment to the Kubernetes cluster in production is a scheduled release task to be coordinated with the Release Management Team.
+
+</p></p>
+
+<table class="table">
+    <tr>
+        <td>F5</td> <td>https://services.sec.ibm.com/<b>micro</b>/<code>{repo_name}</code></td>
+    </tr>
+    <tr>
+        <td>API Gateway</td> <td>https://xpsws-gateway.atl-prd.k8s.sec.ibm.com/<b>micro</b>/<code>{repo_name}</code></td>
+    </tr>
+    <tr>
+        <td>Kubernetes Ingress</td> <td>https://<code>{repo_name}</code>.atl-prd.k8s.sec.ibm.com</td>
+    </tr>
+</table>
+
+</p></p>
+
+<b>Note:</b> Feature branches are not supported in Stg and Prod. All requests go to the "master" branch for microservices that are deployed to Stg and Prod.
+
+
+<h2 class="uk-h3 tm-heading-fragment">Next Steps</h2>
+
+This section covers the Build & Deploy step in the Microservice Developer's workflow, including the CI/CD build process, the use of feature branches, and the relationship between a repository name, F5 URLs, and the internal request forwarding that takes place when the API Gateway receives microservice API calls. The next step is to verify that all HTTP methods, paths, parameters into and out of the microservice API work as expected, end-to-end, using <a href="" uri="API Explorer">API Explorer</a>.
+

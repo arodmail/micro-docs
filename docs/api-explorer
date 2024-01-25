@@ -1,0 +1,119 @@
+<h2>API Explorer</h2><script>if (document = top) window.location.href = "../index.html";</script>
+
+<div>By Alex Rodriguez | Updated June 01, 2020</div>
+
+</p></p>
+
+API Explorer provides developers with a main page that lists all microservice APIs. The main page in API Explorer links an API to Swagger UI to render and visualize a Swagger definition. Swagger UI exposes the HTTP methods, the API paths, and the expected parameters into and out of an API in an interactive web-based tool. Developers may use API Explorer to send requests to any microservice API using different Authorization credentials and by varying input parameters in order to sample responses from an API.
+
+</p></p>
+
+To login to API Explorer using an AD username and password or Customer Contact credentials:
+
+<ul>
+    <li><a href="https://dal09-dev-services.sec.ibm.com/api_explorer/" target="_blank">Dev</a>
+    </li>
+    <li>
+        <a href="https://stg-services.sec.ibm.com/api_explorer/" target="_blank">Stg</a>
+    </li>
+    <li>
+        <a href="https://services.sec.ibm.com/api_explorer/" target="_blank">Prd</a>
+    </li>
+    <li>
+        <a href="https://eu-services.sec.ibm.com/api_explorer/" target="_blank">EU</a>
+    </li>
+
+</ul>
+
+
+</p></p>
+
+<h3>API Registry</h3>
+
+The API Registry is itself an API that provides methods for applications and microservice developers to save and query data stored in the API Registry, an Elastic Search index. The registry stores information about and categorizes APIs based on their intended use. In the registry, an API is associated with a Core, Consumer, or Sample category. Consumer APIs are high-level and intended to be used by customer facing applications, while Core APIs are low-level, used internally, and typically provide underlying services and data to Consumer APIs. Sample APIs can be used by developers as reference implementations or templates for different kinds of microservices written in different languages and using different frameworks.
+
+</p></p>
+
+An API Registry entry is a small JSON object that defines 5 properties:
+
+<ol>
+    <li> A unique <b>name</b> for the API that associates the entry with a Microservice repository name</li>
+    <li> A <b>title</b> to display on the API Explorer main page</li>
+    <li> The <b>category</b> the API belongs to</li>
+    <li>A <b>status</b> (one of Created, Prototyped, Published, or Deprecated)</li>
+    <li> A <b>privileged</b> boolean flag to restrict access in API Explorer to privileged users</li>
+    <!--<li>An optional <b>base_path</b> to define a path to append to API calls</li> -->
+</ol>
+
+</p></p>
+
+<!--
+<h4>Base Path</h4>
+
+If a <code>base_path</code> is defined for an API, then the API Gateway reads it from the API Registry and automatically appends it to the Kubernetes Ingress URL that API requests are forwarded to. Otherwise, if no <code>base_path</code> is defined in the API Registry, then the API Gateway forwards requests to the Ingress URL without a base_path appended.
+
+</p></p>
+
+For example, a request sent to the Sample API:
+
+<pre>
+https://services.sec.ibm.com/micro/sample
+</pre>
+
+Given a value of <code>/subdomain</code> for the <code>base_path</code>, the request is forwarded by the API Gateway to:
+
+<pre>
+https://sample.atl-prd.k8s.sec.ibm.com/subdomain
+</pre>
+
+If no value for <code>base_path</code> is defined in the API Registry entry for the Sample API, then the API Gateway forwards requests to:
+
+<pre>
+https://sample.atl-prd.k8s.sec.ibm.com
+</pre>
+
+<b>Note:</b> If a <code>base_url</code> is defined for an API in the API Registry, any additional URL paths and parameters that are included in the request sent to the API by an application are appended <i>after</i> the <code>base_url</code>. For example:
+
+<pre>
+https://services.sec.ibm.com/micro/sample/resoures?id=12345
+</pre>
+
+Given a value of <code>/subdomain</code> for the <code>base_path</code>, the request is forwarded by the API Gateway to:
+
+<pre>
+https://sample.atl-prd.k8s.sec.ibm.com/subdomain/resoures?id=12345
+</pre>
+
+If no value for <code>base_path</code> is defined in the API Registry entry for the Sample API, then the API Gateway forwards requests to:
+
+<pre>
+https://sample.atl-prd.k8s.sec.ibm.com/resoures?id=12345
+</pre>
+-->
+
+</p></p>
+
+Microservice developers may add and modify entries to the registry using the POST and PUT methods. APIs that are successfully added to the registry appear on the API Explorer main page. Links for API Registry:
+
+<ul>
+    <li><a href="https://dal09-dev-services.sec.ibm.com/api_explorer/swagger-ui/?url=https://dal09-dev-services.sec.ibm.com/api_explorer/swagger/api_registry" target="_blank">Dev</a>
+    </li>
+    <li>
+        <a href="https://stg-services.sec.ibm.com/api_explorer/swagger-ui/?url=https://stg-services.sec.ibm.com/api_explorer/swagger/api_registry" target="_blank">Stg</a>
+    </li>
+    <li>
+        <a href="https://services.sec.ibm.com/api_explorer/swagger-ui/?url=https://services.sec.ibm.com/api_explorer/swagger/api_registry" target="_blank">Prd</a>
+    </li>
+    <li>
+        <a href="https://eu-services.sec.ibm.com/api_explorer/swagger-ui/?url=https://eu-services.sec.ibm.com/api_explorer/swagger/api_registry" target="_blank">EU</a>
+    </li>
+</ul>
+
+<h2 class="uk-h3 tm-heading-fragment">Auto-Register & Publish APIs</h2>
+
+For an API to appear on the API Explorer main page, the API <b>must</b> be considered <i>production ready</i> and <i>fully documented</i> for exposure to customers and to integrators and its status set to "Published". To manually set an API's status to "Published", microservice developers may use the registration API. See links above for the API Registry PUT method to update an API.
+
+
+<h2 class="uk-h3 tm-heading-fragment">Next Steps</h2>
+
+The next step in the Microservice Developer's workflow is to ensure the documentation for your API meets certain minimum standards for production readiness. For recommendations, see <a href="" uri="Document">Document APIs</a>.

@@ -1,0 +1,168 @@
+<h2>Create a Repo</h2><script>if (document = top) window.location.href = "../index.html";</script>
+
+<div>By Alex Rodriguez | Updated June 01, 2020</div>
+
+</p></p>
+
+To get things started in GitHub, Microservice developers may create a repository to control, version, and integrate source code into the CI/CD build process. There are several ways to accomplish this step. One way is to clone a "micro_template" repository that contains pre-defined sources for the configuration files that drive the CI/CD build and deployment process.
+
+</p></p>
+
+A template project structure is available in the <code><a href="https://github.ibm.com/managed-security/micro_template" target="_blank">micro_template</a></code> repository:
+
+<pre>
+$ tree .
+.
+├── Jenkinsfile
+├── README.md
+├── build.gradle
+├── gradle
+│   └── wrapper
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
+├── gradlew
+├── gradlew.bat
+├── ibm-meta.yaml
+├── owasp-suppression.xml
+└── wrapper.gradle
+
+2 directories, 10 files
+</pre>
+
+</p></p>
+
+The fastest way to get started is to clone the <code>micro_template</code> repository into a new <code>{repo_name}</code>, delete its .git/ folder and then initialize a new Git repository:
+
+<pre>
+git clone https://github.ibm.com/managed-security/micro_template {repo_name}
+cd {repo_name}
+rm -rf .git
+git init
+</pre>
+
+<b>Important Note:</b> The <code>{repo_name}</code> for a Microservice is very important to establish up front. While not impossible to rename a project, it becomes more difficult over time because it is referenced throughout the CI/CD configuration files in the repository and becomes part of the URL that applications address to send requests to the API. For more information about the relationship between <code>{repo_name}</code> and API URLs, see <a href="" uri="Build Deploy">Build & Deploy</a>.
+
+<h2 class="uk-h3 tm-heading-fragment">Project Template Files</h2>
+
+<h4>README.md</h4>
+
+The <code>README.md</code> file in the <code>micro_template</code> repository provides a basic outline for microservice projects. This is not a definitive template and developers may expand it as needed. Note that placeholders for {Microservice_name}, and {repo_name} should be replaced with your project names.
+
+</p></p>
+
+<h4>build.gradle</h4>
+
+The <code>build.gradle</code> template file provides the basic outline but requires developers at a minimum to customize the following sections for their project:
+
+<pre>
+apply plugin: 'net.iss.mss.gradle-java-app'
+mainClass = ''
+serviceArguments = ' '
+jvmArguments = ' '
+</pre>
+
+Provide the name of a <code>mainClass</code>, as well as <code>serviceArguments</code>, and <code>jvmArguments</code> if any, and replace <code>{repo_name}</code> with the name given to your microservice repository:
+
+<pre>
+name = '{repo_name}'
+version = '1.0.0'
+namespace = 'managed-security'
+</pre>
+
+<h4>.gitlab-ci.yaml</h4>
+
+For current details and updates on how to configure this file, see ITPO documentation.
+
+<h4>ibm-meta.yaml</h4>
+
+Replace <code>{repo_name}</code> and update the URI paths and port numbers for the Kubernetes readiness and liveliness probes.
+
+<pre>
+application: {repo_name}
+ports:
+- port: 8080,
+  protocol: tcp
+</pre>
+
+<pre>
+livenessProbe:
+  failureThreshold: 3
+  httpGet:
+    path: /check
+    port: 8080
+    scheme: HTTP
+  initialDelaySeconds: 30
+  periodSeconds: 60
+  successThreshold: 1
+  timeoutSeconds: 5
+</pre>
+
+<pre>
+readinessProbe:
+  failureThreshold: 3
+  httpGet:
+    path: /check
+    port: 8080
+    scheme: HTTP
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 5
+</pre>
+
+A livenessProbe probe determines whether the container is running or not. If the liveness probe fails, then Kubernetes should kill the container. A new container should be started instead, because a restart policy says so.
+
+A readinessProbe determines whether the container is ready to service requests. If the readiness probe fails, then the endpoint's controller should remove the pod’s IP address from the endpoints of all services for that pod.
+
+For more details see <a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/" target="_blank">Configure Liveness, Readiness and Startup Probes</a>.
+
+</p>
+
+Developers may also want to expand the <code>envVars:</code> section to define additional Kubernetes container environment variables:
+
+<pre>
+envVars:
+    dev:
+      - environment: dev
+    stg:
+      - environment: stg
+    prd:
+      - environment: prd
+</pre>
+
+<h4>owasp-suppression.xml</h4>
+
+This is a suppression XML file used to suppress false positives in CPE reports. Here you can suppress individual CVE findings. For more details see: <a href="https://jeremylong.github.io/DependencyCheck/general/suppression.html" target="_blank">Suppressing False Positives</a>.
+
+<h4>wicked-suppression.txt</h4>
+
+This is a suppression text file used to list libraries that are exempt from open source scanning. Here you can suppress individual libraries. For example:
+
+<pre>
+  swagger-parser:1.0.49 (New version and not exempt)
+</pre>
+
+<h4>Source Main</h4>
+
+A Java package structure usually branches from <code>src/main/java</code>. When the CI/CD build process converts source code in a repository to a Docker container image at build time, the <code>scr/main/resources</code> contents are copied to a <code>conf</code> directory under the "Base Installation Directory" for the microservice in the Docker container image under <code>/opt/mssdev/{repo_name}</code>. The <code>conf</code> directory is also appended to the Java CLASSPATH such that different resources that need to be loaded by a Classloader may be added under <code>resources</code>, for example, the log4j2.xml file.
+
+<pre>
+├── src
+│   ├── main
+│   │   ├── java
+│   │   └── resources
+│   └── test
+│       └── java
+</pre>
+
+</p>
+
+Note: For a Java implementation of a microservice, this directory structure may be created manually after the micro_template repo is cloned.
+
+<h4>Source Test</h4>
+
+The Java package structure under <code>src/main/java</code> is typically mirrored under <code>/src/test/java</code> such that at test time, test classes compile to the same packages as the classes they test. This gives the test classes package-level access or access to protected methods and fields. For more details about Microservice tests see <a href="" uri="Write Run Tests">Write & Run Tests</a>.
+
+<h2 class="uk-h3 tm-heading-fragment">Next Steps</h2>
+
+Once a repository for a microservice project is created and initialized, developers may take the next step in the developer's workflow: <a href="" uri="Implementation">Microservice Implementation</a>.

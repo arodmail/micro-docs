@@ -1,0 +1,57 @@
+<h2>Central Config</h2><script>if (document = top) window.location.href = "../index.html";</script>
+
+<div>By Alex Rodriguez | Updated June 01, 2020</div>
+
+</p></p>
+
+Microservices sometimes store configurable parameters in properties files. Configurable parameters that a Microservice reads from a properties file and then uses at run-time are usually stored in a file with a .properties extension and pushed into the  Microservice repository, along with other source code files. In many cases, multiple Microservices end up defining, pushing, and using the same exact property names and values at run-time.
+
+<p/><p/>
+
+To avoid this kind of duplication in .properties files across Microservice repositories, and to ensure that all Microservices read the most current, up-to-date property values from a shared repository at run-time, it is recommended that common property values be retrieved from Central Config.
+
+<p/><p/>
+
+Central Config is an area in the "config-repo" repository in GitHub that is used as a global source of properties. The properties in the config-repo are grouped into "stores" which are sub-divided into environments: dev, stg, and prd. Here we are interested in the "ms-environment" store where most of the properties common to Microservices are kept.
+
+<p/><p/>
+
+To encourage reuse, the Microservices team provides a utility class called "CentralConfigFetcher" that hides all the details that are required to connect, authenticate, and to retrieve properties from Central Config. To use CentralConfigFetcher in your project, add the following dependency to your build.gradle file:
+
+<pre>
+dependencies {
+     mssproject(name: 'common_configuration_utils', version: '0.0.4')
+}
+</pre>
+
+To use CentralConfigFetcher:
+
+<pre>
+CentralConfigFetcher fetcher = new CentralConfigFetcher();
+Properties props = fetcher.getProperties("stg");
+String propValue = props.getProperty("propName");
+</pre>
+
+Where the argument to CentralConfigFetcher.getProperties() may be one of "dev", "stg", or "prd". In the example above, the 'propValue' String will be assigned a value from the "ms-environment" store in the Central Config repository. If the property name is the same across dev, stg, and prd, but the property value is different, then CentralConfigFetcher can be used to retrieve environment specific property values.
+
+<p/><p/>
+
+To define additional properties in Central Config, clone the repository:
+
+<pre>
+git clone https://gitlab.sec.ibm.com/devops/config-repo/
+</pre>
+
+Update the .yaml files for dev, stg, and prd under:
+
+<pre>
+https://gitlab.sec.ibm.com/devops/config-repo/tree/master/config-store/ms_environment
+</pre>
+
+Then commit and push your new properties into a features branch, and submit a merge request for the master branch of the "config-repo" to the ITPO Team. After these steps, your Microservice should be able to access the newly defined property:
+
+<pre>
+CentralConfigFetcher fetcher = new CentralConfigFetcher();
+Properties props = fetcher.getProperties(env);
+String myPropValue = props.getProperty("myPropName");
+</pre>

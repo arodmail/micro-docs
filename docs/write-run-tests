@@ -1,0 +1,116 @@
+<h2>Write & Run Tests</h2><script>if (document = top) window.location.href = "../index.html";</script>
+
+<div>By Alex Rodriguez | Updated June 01, 2020</div>
+
+</p></p>
+
+For Microservices, there are 4 test strategies that are intended to be linked together, following a "bottom-up" layered approach to testing software. In this approach, small tests run first followed by tests that validate microservice interfaces. The success of tests in these first 2 layers give an indication that slightly more complex tests that explore deeper paths through the microservice are ready to be run in isolation from dependencies on other microservices, caches, and data sources.
+
+</p></p>
+
+After a microservice passes through the first 3 layers successfully, then a complete end-to-end system is ready to be tested reliably. Microservices that are tested this way, by gradually increasing the complexity of the tests that are run at each layer, are expected to save developers and testers considerable time identifying the root causes for test failures on a layer-by-layer basis because there are only specific things that can go wrong at each layer. This approach takes a lot of the guess work out of test failure analysis and is expected to simplify end-to-end testing because at this higher level when a test fails, developers and testers don't need to spend time looking for root causes in the lower levels, and instead can focus their attention on the configuration of the environment where the microservice runs.
+
+</p></p>
+
+While test strategies can be layered in this way, not all microservices will benefit from this approach. It's entirely up to the development team to decide how many and what kinds of tests they want to write and run.
+
+</p></p>
+
+<h2 class="uk-h3 tm-heading-fragment">Microservice Test Layers</h2>
+
+<div align="center"><img src="images/test-layers.png" width="800" height="400"/></div>
+
+<h3 class="uk-h3 tm-heading-fragment">Layer 1: Unit Tests</h3>
+
+Test single API calls in isolation. Check an endpoint for a basic response. A Unit Test is intended to be very basic and simple. Only check HTTP response codes and/or the presence of a response body but don't try to parse a response or validate it. To restrict the scope of the test, Unit Tests may send requests to a /check endpoint that microservices expose, or may pass a flag to the microservice to indicate that it is being unit tested.
+
+</p></p>
+
+For example, a JUnit test that uses classes in the <a href="http://hc.apache.org/" target="_blank">Apache HttpComponents</a> project to run a responsiveness test:
+
+<pre>
+@Test
+public void test() throws IOException {
+    CloseableHttpClient httpclient =
+        HttpClients.custom().setDefaultCredentialsProvider(new BasicCredentialsProvider()).build();
+    CloseableHttpResponse httpResponse = httpclient.execute(new HttpGet("http://localhost:1080/check"));
+    assertEquals(HttpStatus.SC_OK, httpResponse.getStatusLine().getStatusCode());
+}
+</pre>
+
+
+
+<h3 class="uk-h3 tm-heading-fragment">Layer 2: Contract Tests</h3>
+
+Test an interface by comparing it to an interface specification. For example, if a API spec says an ID field is always included in a  response, then the test checks for the presence of an ID field. Also, if the API spec says the ID field is numeric, then the test checks the data type of the field value in the response. Contract Tests only exercise and validate the API including API parameters according to a spec.
+
+</p></p>
+
+A basic contract test is initialized by reading/parsing the Swagger definition for the API, or the API spec:
+
+<pre>
+    // Get Swagger (Open API Specification)
+    URL swaggerUrl = ContractTest.class.getClassLoader().getResource("http://localhost:1080/swagger");
+    assert swaggerUrl != null;
+    Swagger swagger = new SwaggerParser().read(swaggerUrl.getPath());
+</pre>
+
+The contract test then fetches a response from the API to be compared to the spec:
+
+<pre>
+    // Get response payload for /resource
+    CloseableHttpClient httpclient =
+        HttpClients.custom().setDefaultCredentialsProvider(new BasicCredentialsProvider()).build();
+    response = httpclient.execute(new HttpGet("http://localhost:1080/resource/123"));
+
+    HttpEntity entity = response.getEntity();
+    assertNotNull(entity);
+    payLoad = EntityUtils.toString(entity);
+</pre>
+
+The test then runs a series of comparisons between the spec and the response from the API:
+
+<pre>
+    // Flatten Swagger definitions names/types
+    Map&lt;String, String&gt; namesAndTypes = new HashMap&lt;&gt;();
+
+    Set&lt;Map.Entry&lt;String, Model&gt;&gt; definitions = swagger.getDefinitions().entrySet();
+    for (Map.Entry&lt;String, Model&gt; modelEntry : definitions) {
+        Set&lt;Map.Entry&lt;String, Property&gt;&gt; properties = modelEntry.getValue().getProperties().entrySet();
+        for (Map.Entry&lt;String, Property&gt; propertyEntry : properties) {
+            namesAndTypes.put(propertyEntry.getKey(), propertyEntry.getValue().getType());
+        }
+    }
+
+    // Check response conformance with the spec, element by element
+    JsonObject obj = new JsonParser().parse(responseString).getAsJsonObject();
+    Set&lt;Map.Entry&lt;String, JsonElement&gt;&gt; entries = obj.entrySet();
+    for (Map.Entry&lt;String, JsonElement&gt; entry : entries) {
+
+        // verify that the elements in the response payload are defined by the spec
+        Assert.assertTrue(namesAndTypes.containsKey(entry.getKey()));
+
+    }
+</pre>
+
+The example above reads the properties from the Objects in the Swagger <code>definitions:</code> section to check the response  for conformance with the spec, that the response has the properties of an Object defined by the spec.
+
+<h3 class="uk-h3 tm-heading-fragment">Layer 3: Integration Tests</h3>
+
+Integration testing is about testing API call sequences. For example, if microservice A calls micro B, then an Integration Test mocks micro B when micro A calls it. When an Integration Test runs, micro A sends a request to <i>mock</i> micro B and attempts to pass the test by consuming a mock response from mock micro B. Integration Tests verify microservice processing and logic in complete isolation from dependencies on other microservices, caches, and data sources which should be mocked when Integration Tests run. When an Integration Test passes, it gives an indication that the microservice is ready to be integrated with a dependency. This level of testing gives developers an opportunity to <i>simulate</i> the responses from external applications, to verify response processing, and to build error handling into microservices to behave gracefully when external applications don't respond as expected.
+
+</p></p>
+
+<h3 class="uk-h3 tm-heading-fragment">Layer 4: End-To-End Tests</h3>
+
+Here tests are dependent on the state of other microservices, and on the state of specific applications such as caches and data sources. Tests execute in a complete environment and microservices connect to and get data from a cache or a data source or both. A complete test environment should be defined as code in a repository and deployed automatically before e2e tests run. End-to-End tests are executed after deployment of the microservice is successful into the container platform.
+
+</p></p>
+
+Microservice developers should be aware of end-to-end testing. Use of <a href="" uri="API Explorer">API Explorer</a> as the basis for End-to-End testing of microservices is a highly recommended approach.
+
+</p></p>
+
+<h2 class="uk-h3 tm-heading-fragment">Next Steps</h2>
+
+After deciding how many and what kinds of tests to write and run, developers may take the next step in the developer's workflow: <a href="" uri="Build Deploy">Build & Deploy</a>.

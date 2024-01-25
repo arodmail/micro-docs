@@ -1,0 +1,37 @@
+<h2>Secure Proxy Sidecar</h2><script>if (document = top) window.location.href = "../index.html";</script>
+
+<div>By Alex Rodriguez | Updated June 01, 2020</div>
+
+</p></p>
+
+As the number of microservices running in the Kubernetes cluster increases, development teams start to see common problems emerge. One common problem that most, if not all microservices share is security: how do all microservices ensure, without duplicating code, that the data in their responses is authorized to be given to the users who are requesting it?
+
+</p></p>
+
+One solution to this problem is to adopt a microservices design pattern that has increasingly become popular called the <i>sidecar</i>. A sidecar is implemented as a container image that runs in a multi-container pod, and is designed to proxy requests and to filter responses in order to perform security checks consistently and uniformly for each microservice that needs the additional security.
+
+</p></p>
+
+To add the Secure Proxy Sidecar to your microservice, make sure your service listens on port 3333 for HTTP requests, and add the following line to your ibm-meta.yaml file:
+
+<pre>
+sidecar: secure_proxy_ms:1.0.0
+</pre>
+
+When a microservice that adds the Secure Proxy Sidecar is deployed to the Kubernetes cluster in dev, stg, or prd, the CI/CD build process creates a multi-container pod in which the microservice container image and the sidecar container image run side by side. When an API call is forwarded by the API Gateway to the microservice that runs in a multi-container pod with the sidecar enabled, the request is intercepted by the sidecar on the way in to perform security checks on the request, and filtered on the way out to secure the response.
+
+</p></p>
+
+For example, if a user sends a request to a microservice for data they are not allowed to access, based the user's role and privileges, then the sidecar checks and enforces permissions to prevent an unauthorized user from unauthorized access to the data.
+
+</p></p>
+
+To fully secure a microservice that reads data from a security sensitive data source, for example, a microservice that reads Device Ids, Device Group Ids, or Ticket Issue types, it is highly recommended that the sidecar be injected into a multi-container pod to handle these checks automatically. The sidecar is designed to scan requests and responses, adding minimal overhead to overall request processing time while preventing an unknowing microservice implementation from "leaking" unauthorized data to a potentially malicious user.
+
+</p></p>
+
+For a working example of the Secure Proxy Sidecar, see the "customer-ms" Pod in the "integration" namespace in the Kubernetes dev cluster.
+
+<h4 class="uk-h4 tm-heading-fragment">Secure Proxy Sidecar Configuration</h4>
+
+For details about settings in API Swagger definitions that drive the sidecar's inbound request and outbound response security scans, see <a href="" uri="Secure">Secure API</a> > Authorization.
