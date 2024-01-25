@@ -135,7 +135,7 @@ Where the <code>basePath: "/micro/sample"</code> is expected to be the root of a
 
 </p></p>
 
-<b>Note:</b> In Microservices all HTTP traffic is proxied by an API Gateway. The basePath field value should always start with a "/micro" prefix to ensure HTTP requests are recognized and processed by the API Gateway. The "/sample" part of the basePath in the example above typically matches up with the name given to a Microservice repository. For more details about Microservice GitHub  repository names and the relationship to an API's basePath, see <a href="" uri="Create a Repo"> Create a Repo</a> and <a href="" uri="Build Deploy">Build & Deploy</a>
+<b>Note:</b> In Microservices all HTTP traffic is proxied by an API Gateway. The basePath field value should always start with a "/micro" prefix to ensure HTTP requests are recognized and processed by the API Gateway. The "/sample" part of the basePath in the example above typically matches up with the name given to a Microservice repository. For more details about Microservice GitHub  repository names and the relationship to an API's basePath, see <a href="" uri="create-a-repo"> Create a Repo</a> and <a href="" uri="build-deploy">Build & Deploy</a>
 
 </p></p>
 
@@ -335,7 +335,7 @@ The full "Sample API" Swagger definition can be viewed in API Explorer under "Sa
   </li>
 </ul>
 
-To authenticate through the API Explorer links above, see <a href="" uri="Secure">API Security</a> > Authentication
+To authenticate through the API Explorer links above, see <a href="" uri="security">API Security</a> > Authentication
 
 <h2 class="uk-h3 tm-heading-fragment">Next Steps</h2>
 
