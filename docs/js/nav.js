@@ -51,7 +51,7 @@
             history.pushState(defaultData, null, defaultUrl);
             loadContent(defaultUrl);
         } else {
-            loadContent(link + ".html");
+            loadContent(link);
         }
         document.title = defaultTitle;
     })
