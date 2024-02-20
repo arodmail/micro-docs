@@ -12,7 +12,8 @@ function loadContent(target, reload) {
             return; // or other error handling
         }  else {
             if (reload) {
-                window.location.href = "../index.html"
+                console.log("Reload true");
+                window.location.href = "../index.html";
             }
             document.getElementById('main-body').innerHTML = this.responseText;
             window.scrollTo(0, 0);
