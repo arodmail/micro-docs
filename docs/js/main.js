@@ -11,7 +11,7 @@ function loadContent(target, reload) {
         if (this.status!==200) {
             return; // or other error handling
         }  else {
-            if (reload) {
+            if (reload == 'true') {
                 console.log("Reload true");
                 window.location.href = "../index.html";
             }
