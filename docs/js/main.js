@@ -1,5 +1,5 @@
 
-function loadContent(target, reload) {
+function loadContent(target) {
     var xhr= new XMLHttpRequest();
     xhr.open('GET', target, true);
 
@@ -11,10 +11,6 @@ function loadContent(target, reload) {
         if (this.status!==200) {
             return; // or other error handling
         }  else {
-            if (reload == 'true') {
-                console.log("Reload true");
-                window.location.href = "../index.html";
-            }
             document.getElementById('main-body').innerHTML = this.responseText;
             window.scrollTo(0, 0);
         }
