@@ -1,4 +1,3 @@
-<html>
 <h2 class="uk-h2">Getting Started</h2><script>if (document = top) window.location.href = "../index.html";</script>
 
 <div>By Alex Rodriguez | Updated June 01, 2020</div>
@@ -48,6 +47,4 @@ The Test stage of the workflow proposes a multi-layered approach to testing Micr
 The Deploy stage covers the <a uri="build-deploy">Build & Deploy</a> step in the Microservice Developer's workflow, including the CI/CD build process, the use of feature branches, and the relationship between a repository name, F5 URLs, and the internal request forwarding that takes place when the API Gateway receives Microservice API calls.
 
 </p></p>
-
-<html>
 
