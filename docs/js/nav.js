@@ -7,7 +7,7 @@
 
     window.addEventListener('load', function (event) {
         history.pushState(defaultData, null, defaultUrl);
-        loadContent(defaultUrl, false);
+        loadContent(defaultUrl, 'false');
         document.title = defaultTitle;
     })
 
@@ -21,7 +21,7 @@
             var data = event.target.getAttribute('uri'),
                 url = '/micro-docs/' + data;
             history.pushState(data, null, url);
-            loadContent(url, false);
+            loadContent(url, 'false');
         }
         event.stopPropagation();
     }, false);
@@ -39,7 +39,7 @@
                 var data = event.target.getAttribute('uri'),
                     url = '/micro-docs/' + data;
                 history.pushState(data, null, url);
-                loadContent(url,false);
+                loadContent(url,'false');
             }
         }
         event.stopPropagation();
@@ -49,9 +49,9 @@
         var link = event.state;
         if (link == null) {
             history.pushState(defaultData, null, defaultUrl);
-            loadContent(defaultUrl, false);
+            loadContent(defaultUrl, 'false');
         } else {
-            loadContent(link, false);
+            loadContent(link, 'false');
         }
         document.title = defaultTitle;
     })
