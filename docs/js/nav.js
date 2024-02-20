@@ -3,7 +3,7 @@
     "use strict";
 
     var defaultData = "getting-started",
-        defaultUrl = '/micro-docs/' + defaultData;
+        defaultUrl = '/micro-docs/' + defaultData + "/";
 
     window.addEventListener('load', function (event) {
         history.pushState(defaultData, null, defaultUrl);
@@ -19,7 +19,7 @@
         if (event.target != event.currentTarget) {
             event.preventDefault();
             var data = event.target.getAttribute('uri'),
-                url = '/micro-docs/' + data;
+                url = '/micro-docs/' + data + "/";
             history.pushState(data, null, url);
             loadContent(url);
         }
@@ -37,7 +37,7 @@
             if (event.target != event.currentTarget) {
                 event.preventDefault();
                 var data = event.target.getAttribute('uri'),
-                    url = '/micro-docs/' + data;
+                    url = '/micro-docs/' + data + "/";
                 history.pushState(data, null, url);
                 loadContent(url);
             }
