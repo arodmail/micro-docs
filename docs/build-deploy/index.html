@@ -1,6 +1,6 @@
 <h2>Build & Deploy</h2><script>if (document = top) window.location.href = "../index.html";</script>
 
-<div>By Alex Rodriguez | Updated June 01, 2020</div>
+<div>By Alex Rodriguez</div>
 
 </p></p>
 
@@ -10,7 +10,7 @@ The Build & Deploy step in the Microservices Developer workflow ensures that all
 $ ./gradlew build
 
 > Configure project :
-Using MSS Gradle plugins version 1.0.3-itpo-2460-k8s-SNAPSHOT built at 2019-06-26 15:27:36 +0000 (UTC)
+Using MSS Gradle plugins version 1.0.3-itpo-2460-k8s-SNAPSHOT built at YYYY-MM-DD 12:00:00 +0000 (UTC)
 
 > Task :test
 
@@ -97,15 +97,15 @@ A Publish job in the CI/CD Pipeline deploys a new container image that is create
 <pre>
 Pushed image docker-registry.sec.ibm.com:5000/sample:1.0.80-integration-snapshot
 :deployToKubernetes
-I, [2019-10-08T15:52:51.641377 #1]  INFO -- : Waiting until service is ready
-I, [2019-10-08T15:53:53.796432 #1]  INFO -- : sample:1.0.80-integration-snapshot deployed successfully on namespace integration
-I, [2019-10-08T15:53:53.796926 #1]  INFO -- : Switching versions for application sample
-I, [2019-10-08T15:53:57.679381 #1]  INFO -- : Switch completed successfully
-I, [2019-10-08T15:54:00.050928 #1]  INFO -- : Deleting deploy/sample-f545925ye3
+I, [YYYY-MM-DDT15:52:51.641377 #1]  INFO -- : Waiting until service is ready
+I, [YYYY-MM-DDT15:53:53.796432 #1]  INFO -- : sample:1.0.80-integration-snapshot deployed successfully on namespace integration
+I, [YYYY-MM-DDT15:53:53.796926 #1]  INFO -- : Switching versions for application sample
+I, [YYYY-MM-DDT15:53:57.679381 #1]  INFO -- : Switch completed successfully
+I, [YYYY-MM-DDT15:54:00.050928 #1]  INFO -- : Deleting deploy/sample-f545925ye3
 +-----------------------------+---------------------+---------+--------+---------+--------------------------+----------------------------------------------------------+
 |           Version           |   Deployment Date   | Healthy | Active | Passive | Deployment Configuration |                           URL                            |
 +-----------------------------+---------------------+---------+--------+---------+--------------------------+----------------------------------------------------------+
-| 1.0.80-integration-snapshot | 2018-10-08 15:52:44 | true    | true   | false   | sample-f5j996aja0        | https://sample-integration.dal09-dev.k8s-lab.sec.ibm.com |
+| 1.0.80-integration-snapshot | YYYY-MM-DD 15:52:44 | true    | true   | false   | sample-f5j996aja0        | https://sample-integration.dal09-dev.k8s-lab.sec.ibm.com |
 +-----------------------------+---------------------+---------+--------+---------+--------------------------+----------------------------------------------------------+
 :deployToOpenshift
 
